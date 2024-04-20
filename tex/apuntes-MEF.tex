@@ -1,0 +1,86 @@
+\documentclass[11pt,leqno]{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Using Packages
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[margin={2.5cm,2cm}]{geometry}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{graphicx}
+\usepackage{color}
+% \usepackage{empheq}  % Enfatizar, añadir marcos, etc a ecuaciones
+% \usepackage{mdframed}  % Cuadros que pueden extenderse a varias páginas
+% \usepackage{booktabs} % Quality tables
+% \usepackage{psfrag}  % Gráficas (plot) en LaTeX
+% \usepackage{pgfplots} % Gráficas (plot) en LaTeX usando PGF
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% Page Setting 
+% \geometry{a4paper}
+\renewcommand{\baselinestretch}{1.05}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% Teoremas, etc
+\theoremstyle{plain}
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{lemma}[theorem]{Lema}
+\newtheorem{corolary}[theorem]{Corolario}
+\newtheorem{remark}[theorem]{Observación}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definición}
+\newtheorem*{example}{Ejemplo}
+\newtheorem*{exercise}{Ejercicio}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% Define some useful colors 
+\definecolor{ocre}{RGB}{243,102,25}
+\definecolor{mygray}{RGB}{243,243,244}
+\definecolor{deepGreen}{RGB}{26,111,0}
+\definecolor{shallowGreen}{RGB}{235,255,255}
+\definecolor{deepBlue}{RGB}{61,124,222}
+\definecolor{shallowBlue}{RGB}{235,249,255}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% Define an orangebox command 
+\newcommand\orangebox[1]{\fcolorbox{ocre}{mygray}{\hspace{1em}#1\hspace{1em}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Plotting Settings 
+% \usepgfplotslibrary{colorbrewer}
+% \pgfplotsset{width=8cm,compat=1.9}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Párrafos
+\setcounter{secnumdepth}{5}
+\newcounter{stepnum}[section]
+\newcommand{\step}{\bigskip\noindent\textbf{\thesection.\refstepcounter{stepnum}\thestepnum}.\enspace}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%% Mis definiciones
+\newcommand{\Rset}{\ensuremath{\mathbb{R}}}
+\newcommand{\xx}{\ensuremath{\mathbf{x}}\xspace}
+\newcommand{\uu}{\ensuremath{\mathbf{u}}\xspace}
+\newcommand{\vv}{\ensuremath{\mathbf{v}}\xspace}
+\newcommand{\pp}{\ensuremath{p}\xspace}
+\newcommand{\qq}{\ensuremath{q}\xspace}
+\newcommand{\ff}{\ensuremath{\mathbf{f}}\xspace}
+
+\newcommand{\VV}{\ensuremath{\mathbf{V}}\xspace}
+\newcommand{\QQ}{\ensuremath{Q}\xspace}
+\newcommand{\XX}{\ensuremath{\mathbf{X}}\xspace}
+\newcommand{\Dtest}{\ensuremath{\mathcal{D}}\xspace}
+
+\newcommand{\grad}{\ensuremath{\nabla}}
+\renewcommand{\div}{\ensuremath{\nabla\cdot}}
+\newcommand{\en}{\quad\text{en}\ }
+\newcommand{\sobre}{\quad\text{sobre}\ }
+
+\newcommand{\norm}[2][]{\ensuremath{\|#2\|_{#1}}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Title & Author 
+\title{El Método de los Elementos Finitos para Problemas Elípticos}
+\author{J. Rafael Rodríguez Galván}
+
+\begin{document}
+    \maketitle
+    
+\end{document}
