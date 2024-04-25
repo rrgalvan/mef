@@ -1,9 +1,12 @@
-\documentclass[11pt,leqno]{article}
+% !TEX root = apuntes-MEF.tex
+% !TEX spellcheck = es
+
+\documentclass[11pt]{article}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%% Using Packages
 \usepackage[spanish]{babel}
 \usepackage[utf8]{inputenc}
-\usepackage[margin={2.5cm,2cm}]{geometry}
+\usepackage[hmargin={2.7cm,2.2cm}, vmargin={2.2cm, 2.2cm}]{geometry}
 \usepackage{graphicx}
 \usepackage{amssymb}
 \usepackage{amsmath}
@@ -11,6 +14,14 @@
 \usepackage{graphicx}
 \usepackage{color}
 \usepackage{xspace}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+  urlcolor    = blue, %Colour for external hyperlinks
+  linkcolor   = blue, %Colour of internal links
+  citecolor   = green %Colour of citations
+}
+
 % \usepackage{bm} % Bold math
 % \usepackage{empheq}  % Enfatizar, añadir marcos, etc a ecuaciones
 % \usepackage{mdframed}  % Cuadros que pueden extenderse a varias páginas
@@ -56,9 +67,16 @@
 \newcounter{stepnum}[section]
 \newcommand{\step}{\bigskip\noindent\textbf{\thesection.\refstepcounter{stepnum}\thestepnum}.\enspace}
 
+\newcommand{\deff}[1]{\textit{\textbf{#1}}}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%% Mis definiciones
+\newcommand{\N}{\ensuremath{\mathbb{N}}}
+\newcommand{\Z}{\ensuremath{\mathbb{Z}}}
+\newcommand{\Q}{\ensuremath{\mathbb{Q}}}
 \newcommand{\R}{\ensuremath{\mathbb{R}}}
-\newcommand{\Rset}{\ensuremath{\mathbb{R}}}
+\newcommand{\C}{\ensuremath{\mathbb{C}}}
+\renewcommand{\P}{\ensuremath{\mathbb{P}}}
+
 \newcommand{\xx}{\ensuremath{\mathbf{x}}\xspace}
 \newcommand{\uu}{\ensuremath{\mathbf{u}}\xspace}
 \newcommand{\vv}{\ensuremath{\mathbf {v}}\xspace}
@@ -77,25 +95,26 @@
 \newcommand{\en}{\quad\text{en}\ }
 \newcommand{\sobre}{\quad\text{sobre}\ }
 
+\newcommand{\uxx}{\ensuremath{u_{xx}}\xspace}
+\newcommand{\uyy}{\ensuremath{u_{yy}}\xspace}
+
 \newcommand{\norm}[2][]{\ensuremath{\|#2\|_{#1}}}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Title & Author 
-\title{El Método de los Elementos Finitos para Problemas Elípticos}
+\title{Breve Introducción al Método de los Elementos Finitos para Problemas Elípticos}
 \author{J. Rafael Rodríguez Galván}
 
 \begin{document}
 \maketitle
 
-%-------------------------------------------------------------
+%----------------------------------------------------
 \section{Introducción}
-%-------------------------------------------------------------
-
-El objetivo de este documento es la descripción del método de los elementos finitos para problemas elípticos de una forma simple pero rigurosa. 
+%----------------------------------------------------
 
 \step
-Sea  $\Omega\subset\Rset^d$ un dominio abierto y acotado, donde en la práctica $d\in\{1,2,3\}$, con frontera $\partial\Omega$ suficientemente regular%
-\footnote{Entenderemos que la frontera es regular si es localmente parametrizable por funciones Lipschitzianas, ver por ejemplo~\cite{Ern-Guermond:04}}.
+Sea  $\Omega\subset\R^d$ un dominio abierto y acotado, en la práctica $d\in\{1,2,3\}$, con frontera $\partial\Omega$ suficientemente regular%
+\footnote{Entenderemos que la frontera es regular si es localmente parametrizable por funciones Lipschitzianas, ver por ejemplo~\cite{Ern-Guermond:04}.}.
 En el caso general, dividiremos $\partial\Omega$ en dos partes disjuntas donde impondremos respectivamente condiciones de contorno de tipo Dirichlet y Neumann: $\partial\Omega = \Gamma_D\cup\Gamma_N$,  $\Gamma_D\cap\Gamma_N=\emptyset$.  Podría ser $\Gamma_N=\emptyset$, si no se imponen condiciones Neumann (o $\Gamma_D=\emptyset$ si no hay condiciones Dirichlet).
 
 Consideremos el siguiente problema de Poisson:
@@ -114,14 +133,220 @@ donde $\Delta u = \partial^ 2 u/\partial x^2 + \partial^ 2 u/\partial y^2$ es el
 \step
 Más adelante veremos que, simplemente asumiendo que $f$, $g_D$ y $g_N$ sean funciones de cuadrado integrable, existe una única solución de~\eqref{eq:problema.modelo} en un sentido débil. Y,  si los datos son funciones continuas en sus dominios, ésta es la solución clásica del problema de Poisson-Dirichlet-Neumann anterior, es decir $u\in C^0(\Omega)\cap C^2(\Omega)$ y las igualdades en~\eqref{eq:problema.modelo} se verifican puntualmente, para todo $\xx\in\overline\Omega$.
 
-A pesar de que este método despliega toda su potencia en la aproximación de problemas bidimensionales%
-\footnote{Para una introducción algo más avanzada, yo habría preferidoabordar directamente el caso bidimensional, como algunos autores de la talla de J. Sayas~\cite{sayas2008gentle}}, %
-comenzaremos estudiando el caso $d=1$ en la siguiente sección. 
+\step
 
-%-------------------------------------------------------------
-\section{El Problema de Poisson en Dominios Unidimensionales}
-%-------------------------------------------------------------
+El objetivo de este documento es la descripción,  de una forma simple pero rigurosa, del \textbf{método de los elementos finitos} para aproximar la solución de este problema. 
+A pesar de que este método despliega toda su potencia en la aproximación de problemas bidimensionales%
+\footnote{Para una introducción algo más avanzada, yo habría preferidoabordar directamente el caso bidimensional, como algunos autores de la talla de J. Sayas~\cite{sayas2008gentle}.}, %
+comenzaremos estudiando el caso $d=1$ en la siguiente sección. Más adelante se comprobará cómo los razonamientos son fácilmente generalizables  a $d\geq 2$.
+
+La idea de este método consiste en descomponer el dominio como unión de «elementos» más sencillos (por ejemplo, triángulos en el caso $2$--dimensional o en subintervalos en el caso $1$--dimensional) y aproximar la solución de~\eqref{eq:problema.modelo} mediante funciones continuas que, en cada elemento, son polinomios de un grado, $k$, preestablecido. 
+
+En el caso $1$--dimensional y para $k=1$, éstas serán simplemente funciones poligonales. Pero, estas funciones, no son derivables en general. Entonces, ¿en qué sentido podemos decir que verifican~\eqref{eq:problema.modelo}? ¿Qué entendemos por derivada de una función poligonal? La respuesta está en los espacios de funciones derivables en un sentido débil que definiremos en el siguiente apartado.
+
+%----------------------------------------------------
+\section{Algunas Nociones de Análisis Funcional}
+%----------------------------------------------------
+\label{sec:análisis.funcional}
+
+Para las poder definir precisamente las herramientas matemáticas que son objeto de este documento, es conveniente repasar previamente una serie de conceptos básicos sobre espacios de funciones. Los resultados se enuncian sin demostración. Para ver más detalles, pueden consultarse por ejemplo~\cite{adams2003sobolev, sayas2019variational}.
+
+\subsection*{Normas y Productos Escalares}
+Sea $V$ un espacio vectorial sobre el cuerpo\footnote{Por supuesto, todos estos conceptos se generalizan a otros cuerpos como $\Q$} $\R$, finito o infinito dimensional, cuyos elementos estarán formados por funciones. Por ejemplo, $V=\P_2[x]$, el conjunto de los polinomios con coeficientes reales de grado menor o igual a $2$, o $V=C(0,1)$ (funciones continuas en el intervalo $(0,1)$). 
+
+\step 
+Un \deff{espacio normado} es cualquier  espacio vectorial $V$ dotado de una \deff{norma}, es decir de una aplicación $\norm[V]{\cdot}$: $v\in V \longmapsto \norm[V]{v}\in\R_+$ tal que: (1) $\norm[V]{v}=0 \Leftrightarrow v=0$, (2) $\norm[V]{\lambda \cdot v}=|\lambda|\cdot\norm[V]{v}$, para todos $\lambda\in\R$, $v\in V$ y (3) $\norm[V]{v+w}\le \norm[V]{v}+\norm[V]{w}$  para todos $v, w\in V$.
+
+\step Un \deff{producto escalar} sobre $V$ es una aplicación bilineal (lineal en sus dos variables),
+\[
+  (\cdot,\cdot)_V: (v,w)\in V\times V \longmapsto (v,w)_V\in\R
+\]
+tal que, para todos $v,w\in V$: (1) $(v,w)_V=(w,v)_V$  (2) $(v,v)\ge 0$ y (3) $(v,v)=0 \Leftrightarrow v=0$.
+
+\step 
+% \begin{proposition}
+  Si $(\cdot,\cdot)_V$ es un producto escalar sobre $V$, la siguiente expresión define una norma en $V$ (\deff{norma subordinada} al producto escalar) 
+  \[
+    \norm[V]{v} = \big(v,v)_V^{1/2}
+  \]
+y además se verifica la desigualdad de \textit{\textbf{Cauchy-Schwarz}}:
+  \begin{equation}
+    (v,w)_V \le \norm[V]{v}\norm[V]{w}, \quad \forall u, v \in V.
+  \end{equation}
+% \end{proposition}
+
+\step 
+Se llama \deff{espacio de Banach} a todo espacio normado $V$ que es completo, es decir, tal que toda sucesión de Cauchy es convergente (para $\norm[V]{\cdot}$) y su límite está en $V$.
+
+\step 
+Dados dos espacios normados, $V$ y $W$, se denota por $\mathcal{L}(V,W)$ al conjunto de todas las funcines lineales de $V$ en $W$. Este conjunto es un espacio vectorial y a sus elementos, $A:V\to W$, se les llama \deff{operadores} (lineales).
+
+\step 
+Se denomina \deff{espacio de Hilbert} a todo aquel espacio vectorial $V$ dotado de un producto escalar y tal que $V$ es completo para la norma subordinada (por tanto, todo espacio de Hilbert es un espacio de Banach). 
+\subsection*{Espacios de Lebesgue y Sobolev}
+
+\step 
+Denotamos por $L^1(\Omega)$ al espacio de funciones de $\Omega$ en $\R$ que son integrables en el sentido de Lebesgue. Y más en general, dado $p\in [1,+\infty)$, denotamos
+\begin{equation*}
+  L^p(\Omega) = \big\{ f:\Omega \to \R \ /\ \norm[L^p(\Omega)]{f} < +\infty \big\},
+\end{equation*}
+donde se define la norma
+\begin{equation*}
+  \norm[L^p(\Omega)]{f} = \left(\int_\Omega |f|^p\right)^{1/p}.
+\end{equation*}
+
+\step
+En el caso $p=+\infty$, definimos
+\begin{equation*}
+  L^\infty(\Omega) = \big\{ f:\Omega \to \R \ /\ \norm[L^\infty(\Omega)]{f} < +\infty \big\},
+\end{equation*}
+donde
+\begin{equation*}
+  \norm[L^p(\Omega)]{f} = \mathop{\rm ess\hspace{0.4ex}sup}(f) = \mathop{\rm inf} \{M\in\R+ \ /\ |f(x)| \le M \ \text{c.p.t}\ x\in\Omega \}.
+\end{equation*}
+
+\step 
+En el caso $p=2$, $L^2(\Omega)$ es un espacio de Hilbert para el siguiente producto escalar:
+\[
+  (f,g) = (f,g)_{L^2(\Omega)} = \int_\Omega f\cdot g,
+\]
+cuya norma asociada es
+\[
+  \norm[L^2(\Omega)]{f} = \left(\int_\Omega |f|^2\right)^{1/2}.
+\]
+
+\step 
+Definimos el \deff{soporte} de una función $\phi:\Omega\to\R$ como el conjunto
+\[
+  \mathop{\rm sop}(\phi) = \overline{\{x\in\Omega \ /\ \phi(x)\neq 0\}},
+\]
+donde $\overline A$ denota a la clausura de un conjunto $A$ cualquiera en $\R$. 
+
+\step
+Denotamos por $C^\infty_0(\Omega)$ al espacio de funciones $C^\infty(\Omega)$ cuyo soporte es compacto y está contenido en $\Omega$.
+
+\step
+Sea $u\in L^2(\Omega)$. Decimos que $u$ es \deff{derivable en sentido débil}  (con respecto a la variale $x_i$) si existe alguna función $v\in L^2(\Omega)$ tal que
+\[
+  \int_\Omega v \phi(x)\; = -\int_\Omega u \partial_{x_i} \phi \quad \forall \phi \in C^\infty_0(\Omega).
+\]
+En este caso, decimos que $v$ es la \deff{derivada débil} de u\footnote{Para demostrar la unicidad de derivada débil véase, por ejemplo}~\cite{adams2003sobolev} y denotamos $v=\partial_{x_i}u$.
+
+\step 
+Es evidente que si $u\in C^1(\Omega)$ (es derivable en clásico), entonces existe su derivada débil y coincide con la clásica. 
+
+
+\step
+Definimos el \deff{espacio de Sobolev} $H^1(\Omega)$ como 
+
+%----------------------------------------------------
+\section{El Problema de Poisson--Dirichlet Unidimensional}
+%----------------------------------------------------
+
+Comenzaremos en el caso $d=1$, con un dominio $\Omega=(a,b)\subset\R$, $a,b\in\R$. Nos centraremos en el caso particular de~\eqref{eq:problema.modelo} en que $\Gamma_N=\emptyset$, obteniendo el siguiente problema de Poisson-Dirichlet: 
+\begin{equation}
+  \left\{
+    \begin{aligned}
+      - \uxx &= f \en{\Omega}, \\
+      u&=g_D \sobre{\Gamma_D}, \\
+    \end{aligned}
+  \right.
+  \label{eq:problema.dirichlet.homogeneo.1d}
+\end{equation}
+donde denotamos $\uxx = d^2 u/d x^2$ y $\Gamma_D=\partial\Omega=\{a,b\}$. 
+
+
+%----------------------------------------------------
+\section{Formulación Variacional}
+%----------------------------------------------------
+
+En este apartado se estudia una formulación alternativa para el problema~\eqref{eq:problema.dirichlet.homogeneo.1d}. Veremos que ésta permite establecer condiciones suficientes para la existencia y unicidad de solución, en un sentido débil. Soluciones débiles que, de hecho, serán soluciones clásicas siempre que los datos sean suficientemente regulares.
+
+Como veremos luego, este tipo de formulación débil o variacional será la base sobre la que  se construye el método de los elementos finitos.
+
+
+\step
+Suponiendo que $u$ es una solución clásica del problema~\eqref{eq:problema.dirichlet.homogeneo.1d} y $v$ es una función de $C^1(\overline\Omega)$ tal que $v=0$ sobe $\Gamma_D$, basta integrar por partes para obtener:
+\begin{equation*}
+  \int_\Omega (-\uxx)\,v  = -  \int_a^b \uxx(x) v(x) \,dx = 
+  \int_a^b u_x(x) v_x(x)\,dx - \big( u(b)v(b) - u(a)v(a)  \big).
+\end{equation*}
+Y usando que $v(a)=v(b)=0$ y que $-\uxx(x)=f(x)$ para todo $x\in(a,b)$:
+\[
+  \int_a^b u_x(x) v_x(x)\,dx  = \int_a^b f(x) v(x) \, dx.
+\]
+Es decir, toda solución clásica $u$ de~\eqref{eq:problema.dirichlet.homogeneo.1d} verifica, para toda $v\in C^1(\overline\Omega)$ tal que $v(a)=v(b)=0$, una ecuación de la forma:
+\begin{equation}
+  a(u,v) = (f,v),
+\end{equation}
+donde denotamos
+\begin{align}
+  a(u,v)  &= \int_a^b u_x(x) v_x(x)\,dx,  
+  \label{eq:forma.bilineal.a}
+\\
+  (f,v)  &= \int_a^b f(x) v(x) \, dx.
+  \label{eq:producto.l2}
+\end{align}
+
+\step
+Para que la última integral esté bien definida, no es necesario que $f$ y $u$ sean funciones de $C^0([a,b])$: es suficiente que $f$ y $v$ sean funciones de $L^2(\Omega)$, el espacio vectorial de funciones de cuadrado integrable, véase%
+\footnote{De hecho, como se comenta en este apéndice, la expresión~\eqref{eq:producto.l2} es un producto escalar en $L^2(\Omega)$ y éste es un espacio de Hilbert, es cecir, un espacio normado que es completo  para la norma inducida por el producto escalar:
+\[
+  \norm[L^2(\Omega)]{v} = 
+  \big(
+   v, v
+  \big)^{1/2} =
+  \left(
+  \int_\Omega |v(x)|^2 \, dx
+  \right)^{1/2}.
+\]
+}
+el apéndice~\ref{sec:definiciones.basicas}.
+
+Y para que la integral~\eqref{eq:forma.bilineal.a} esté bien definida, no es necesario que $u$ y $v$ sean funciones de $C^1(\Omega)$. Bastaría que tanto $u$ como $v$ tengan derivadas $u'$ y $v'$ en un sentido débil (ver apéndice~\ref{sec:definiciones.basicas}) y que $u',v'\in L^2(\Omega)$. Precisamente, al espacio de funciones de $L^2(\Omega)$ cuya derivada es también de $L^2(\Omega)$ lo denotamos\footnote{
+  De nuevo, y aunque sea menos evidente, la expresión~\eqref{eq:forma.bilineal.a} es un producto escalar en $H^1(\Omega)$.
+} por $H^1(\Omega)$ y así podemos decir que~\eqref{eq:forma.bilineal.a} está bien definido para todos $u,v\in H^1(\Omega)$.
+
+
+
+%
+% \step
+% Como se detalla en el apéndice~\ref{sec:definiciones.basicas}, la expresión $(\cdot,\cdot)$ no es más que el producto escalar en $L^2(\Omega)$ (el espacio de funciones de cuadrado integrable). Por tanto,
+% \[
+%   
+% \]
+%
+% Y a su vez $a(\cdot,\cdot)$ es una forma bilineal en el espacio $H^1(\Omega)$ (el espacio de funciones de $L^2(\Omega)$ con derivadas débiles que son también funciones de $L^2(\Omega)$).
+%
+Por tanto, si definimos el espacio
+\begin{equation*}
+  V= H_0^1(\Omega) = \{v\in H^1(\Omega), \ /\ v(a)=v(b)=0\},
+\end{equation*}
+podemos decir que toda solución clásica $u$ de~\eqref{eq:problema.dirichlet.homogeneo.1d} verifica la siguiente propiedad:
+\begin{equation}
+u \in V, \quad a(u,v) = (f,v) \quad \forall v\in V.
+  \label{eq:formulacon.variacional.1d}
+\end{equation}
+
+
+%----------------------------------------------------
+\appendix
+%----------------------------------------------------
+
+\section{Definciones Básicas de Análisis Funcional}
+\label{sec:definiciones.basicas}
+
+\subsection{Normas y Productos Escalares}
+
+\subsection{Espacios de Banach y de Hilbert}
+
+\subsection{Formas bilineales. Cocertivididad. El teorema de Lax-Milgram}
+
+\subsection{Espacios de Sobolev}
+
 
 \bibliographystyle{unsrt}
 \bibliography{biblio}
 \end{document}
+
+
