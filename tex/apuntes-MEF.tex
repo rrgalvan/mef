@@ -45,7 +45,7 @@
 \newtheorem{definition}[theorem]{Definición}
 \newtheorem*{example}{Ejemplo}
 \newtheorem*{exercise}{Ejercicio}
-
+\newtheorem*{properties}{Propiedades}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Define some useful colors 
 \definecolor{ocre}{RGB}{243,102,25}
@@ -149,9 +149,11 @@ En el caso $1$--dimensional y para $k=1$, éstas serán simplemente funciones po
 %----------------------------------------------------
 \label{sec:análisis.funcional}
 
-Para las poder definir precisamente las herramientas matemáticas que son objeto de este documento, es conveniente repasar previamente una serie de conceptos básicos sobre espacios de funciones. Los resultados se enuncian sin demostración. Para ver más detalles, pueden consultarse por ejemplo~\cite{adams2003sobolev, sayas2019variational}.
+Para las poder definir precisamente las herramientas matemáticas que son objeto de este documento, es conveniente repasar previamente una serie de conceptos básicos sobre espacios de funciones. Los resultados se enuncian sin demostración. Para ver más detalles, pueden consultarse por ejemplo~\cite{adams2003sobolev, sayas2019variational}. En lo que sigue, $\Omega$ denotará a un abierto acotado de $\R^d$, aunque muchos de los conceptos pueden extenderse a dominios no acotados.
 
+%- - - - - - - - - - - - - - - - - - - - - - - - - 
 \subsection*{Normas y Productos Escalares}
+%- - - - - - - - - - - - - - - - - - - - - - - - - 
 Sea $V$ un espacio vectorial sobre el cuerpo\footnote{Por supuesto, todos estos conceptos se generalizan a otros cuerpos como $\Q$} $\R$, finito o infinito dimensional, cuyos elementos estarán formados por funciones. Por ejemplo, $V=\P_2[x]$, el conjunto de los polinomios con coeficientes reales de grado menor o igual a $2$, o $V=C(0,1)$ (funciones continuas en el intervalo $(0,1)$). 
 
 \step 
@@ -183,7 +185,9 @@ Dados dos espacios normados, $V$ y $W$, se denota por $\mathcal{L}(V,W)$ al conj
 
 \step 
 Se denomina \deff{espacio de Hilbert} a todo aquel espacio vectorial $V$ dotado de un producto escalar y tal que $V$ es completo para la norma subordinada (por tanto, todo espacio de Hilbert es un espacio de Banach). 
-\subsection*{Espacios de Lebesgue y Sobolev}
+%- - - - - - - - - - - - - - - - - - - - - - - - - 
+\subsection*{Espacios de Funciones Lebesgue-Integrables}
+%- - - - - - - - - - - - - - - - - - - - - - - - - 
 
 \step 
 Denotamos por $L^1(\Omega)$ al espacio de funciones de $\Omega$ en $\R$ que son integrables en el sentido de Lebesgue. Y más en general, dado $p\in [1,+\infty)$, denotamos
@@ -202,23 +206,35 @@ En el caso $p=+\infty$, definimos
 \end{equation*}
 donde
 \begin{equation*}
-  \norm[L^p(\Omega)]{f} = \mathop{\rm ess\hspace{0.4ex}sup}(f) = \mathop{\rm inf} \{M\in\R+ \ /\ |f(x)| \le M \ \text{c.p.t}\ x\in\Omega \}.
+  \norm[L^p(\Omega)]{f} = \mathop{\rm ess\hspace{0.4ex}sup}(f) = \mathop{\rm inf} \{M\in\R+ \ /\ |f(\xx)| \le M \ \text{c.p.t}\ \xx\in\Omega \}.
 \end{equation*}
 
 \step 
 En el caso $p=2$, $L^2(\Omega)$ es un espacio de Hilbert para el siguiente producto escalar:
-\[
+\begin{equation}
+  \label{producto.escalar.L2}
   (f,g) = (f,g)_{L^2(\Omega)} = \int_\Omega f\cdot g,
-\]
+\end{equation}
 cuya norma asociada es
 \[
   \norm[L^2(\Omega)]{f} = \left(\int_\Omega |f|^2\right)^{1/2}.
 \]
 
+\step
+Algunas propiedades:
+\begin{itemize}
+  \item 
+Si $f^2$ es integrable Riemmann, entonces $f\in L^2(\Omega)$. En particular, toda función continua y acotada en $\Omega$ es integrable y en este sentido $C^(\overline\Omega)\subset L^2(\Omega)$.
+  \item El conjunto $L^p(\Omega)$ se generaliza a funciones con valores en $\R^d$, sin más que considerar en~\eqref{producto.escalar.L2} el producto escalar en $\R^d$ (al multiplicar $f\cdot g$).
+\end{itemize}
+
+%- - - - - - - - - - - - - - - - - - - - - - - - - 
+\subsection*{Espacios de Sobolev}
+%- - - - - - - - - - - - - - - - - - - - - - - - - 
 \step 
-Definimos el \deff{soporte} de una función $\phi:\Omega\to\R$ como el conjunto
+Definimos el \deff{soporte} de una fulnción $\varphi:\Omega\to\R$ como el conjunto
 \[
-  \mathop{\rm sop}(\phi) = \overline{\{x\in\Omega \ /\ \phi(x)\neq 0\}},
+  \mathop{\rm sop}(\varphi) = \overline{\{\xx\in\Omega \ /\ \varphi(\xx)\neq 0\}},
 \]
 donde $\overline A$ denota a la clausura de un conjunto $A$ cualquiera en $\R$. 
 
@@ -228,16 +244,87 @@ Denotamos por $C^\infty_0(\Omega)$ al espacio de funciones $C^\infty(\Omega)$ cu
 \step
 Sea $u\in L^2(\Omega)$. Decimos que $u$ es \deff{derivable en sentido débil}  (con respecto a la variale $x_i$) si existe alguna función $v\in L^2(\Omega)$ tal que
 \[
-  \int_\Omega v \phi(x)\; = -\int_\Omega u \partial_{x_i} \phi \quad \forall \phi \in C^\infty_0(\Omega).
+  \int_\Omega v \varphi(x)\; = -\int_\Omega u \partial_{x_i} \varphi \quad \forall \phi \in C^\infty_0(\Omega).
 \]
-En este caso, decimos que $v$ es la \deff{derivada débil} de u\footnote{Para demostrar la unicidad de derivada débil véase, por ejemplo}~\cite{adams2003sobolev} y denotamos $v=\partial_{x_i}u$.
+En este caso, decimos que $v$ es la \deff{derivada débil} de u y la denotamos como a la derivada convencional, $v=\partial_{x_i}u$ (o $v=u_{x_i}$ o $v=\partial u/\partial{x_i}$ o $v=D_i u$).
 
-\step 
-Es evidente que si $u\in C^1(\Omega)$ (es derivable en clásico), entonces existe su derivada débil y coincide con la clásica. 
+Operadores usuales como el vector \deff{gradiente} o el operador \deff{divergencia} se generalizan a derivadas débiles. La idea de derivada débil se generaliza al concepto más elebante de de distribuciones~\cite{adams2003sobolev}.
 
+\begin{properties}%
+\footnote{Ver, por ejemplo,~\cite{adams2003sobolev}.}
+\begin{enumerate}
+  \item La derivada débil es única salvo conjunto de medida nula.
+  \item Si una función es derivable en sentido clásico, entonces existe su derivada débil y coincide (c.p.d.) con la clásica. Basta integrar por partes para comprobarlo.
+  \item  Las reglas clásicas para las derivadas de sumas y productos de funciones también son válidas para la derivada débil
+\end{enumerate}
+\end{properties}
+Existen funciones que son derivables en sentido débil pero no en sentido clásico. Por ejemplo, si $u(x)=|x|$ en $\Omega=(-1,1)\subset\R$, entonces 
+    \[
+      \partial_x u =u'(x)=  \left\{\begin{aligned}-1 & \quad\text{si } x\le 0,\\ 1 &\quad\text{si } x>0. \end{aligned}\right.
+    \]
+
+Nota: se puede demostrar que esta última función no (por ser discontinua y $d=1$) no es derivable en sentido débil. Por tanto no existe una «segunda derivada débil» de $u(x)=|x|$.
 
 \step
-Definimos el \deff{espacio de Sobolev} $H^1(\Omega)$ como 
+Definimos el \deff{espacio de Sobolev} $H^1(\Omega)$ como el conjunto de las funciones que tienen todas sus derivadas débiles en $L^2(\Omega)$, esto es
+\[
+  H^1(\Omega) = \big\{v\in L^2(\Omega) \ /\ \grad v \in [L^2(\Omega)]^d \big\}.
+\]
+
+\step 
+$H^1(\Omega)$ es un espacio de Hilbert (y por tanto un espacio norrmado completo) para el producto escalar
+\[
+  (u,v)_{H^1(\Omega)} = (u,v)_{L^2(\Omega)} + (\grad u, \grad v)_{L^2(\Omega)}.
+\]
+
+\step Puesto que las funciones de $C^1(\overline\Omega)$ y sus derivadas son de $L^2(\Omega)$,   
+\[
+C^1(\overline\Omega) \subset H^1(\Omega).
+\]
+
+\step 
+Consideremos la siguiente función, a la que llamamos \deff{función traza} sobre $\partial\Omega$:
+\[
+  \gamma:C^0(\overline\Omega) \to C^0(\partial\Omega),
+\]
+que asocia a cada función de $u\in C^0(\overline\Omega)$ su restricción a $\partial\Omega$, $\gamma(u)=u|_{\partial\Omega}$.
+.
+El siguiente resultado, una de las claves en la teoría de espacios de Sobolev, garantiza que se puede definir también una la restricción a la frontera
+%%
+\footnote{Obsérvese que la frontera es un conjunto de medida nula, por tanto no tendría sentido el definir la restricción a $\partial\Omega$ de funciones medibles Lebesgue (y por tanto definida c.p.t. $\xx\in\Omega$).\par 
+Por otra parte, es necesario dotar de sentido preciso al espacio $L^2(\partial\Omega)$, ver por ejemplo~\cite{sayas2019variational}.}
+%%
+de funciones de $H^1(\Omega)$. 
+En concreto, se puede demostrar (ver por ejemplo~\cite{sayas2019variational} el siguiente teorema: existe una función lineal y continua, a la que seguiremos llamando traza y denotando por $\gamma$,
+\[
+  \gamma:  H^1(\Omega) \to L^2(\partial\Omega),
+\]
+que para funciones continuas coincide con la restricción a $\partial\Omega$, es decir verifica:
+\[
+  \gamma(u) = u|_{\partial\Omega} \quad  \forall u\in C^0(\overline\Omega)\cap H^1(\Omega).
+\]
+Abusando del lenguaje, diremos que $u|_{\partial\Omega}=g$ si $\gamma(u)=g$.
+
+\step
+Denotamos por $H_0^1(\Omega)$ al núcleo de $\gamma$. Es decir:
+\[
+  H_0^1(\Omega) = \{ u\in H^1(\Omega) \ /\ \gamma(u)=0\}.
+\]
+
+\step Se verifica la siguiente propiedad: $C_0^\infty(\Omega)\subset H_0^1(\Omega)$ y de hecho%
+%
+\footnote{El hecho de que los espacios de Sobolev pueden ser definidos por completitud no es evidente. Este fue el objeto de una curiosa publicación de sólo dos páginas con el intenioso título «$H=W$»~\cite{meyers1964h}.}
+$$H_0^1(\Omega) = \overline{C_0^\infty(\Omega)}^{H^1(\Omega)},$$ clausura respecto a la norma de $H^1(\Omega)$.
+
+\step \textbf{Desigualdad de Poincaré-Friecrichs}: si $\Omega$ es acotado\footnote{Basta acotado en alguna dirección}, existe una constante $C>0$ tal que 
+\[
+  \norm[\Omega]{u} \le C \norm[\Omega]{\grad u}, \quad\forall u\in H_0^1(\Omega).
+\]
+
+\step Consecuencia: la siguiente expresión define una norma en $H_0^1(\Omega)$ que, de hecho, es equivalente en este espacio a la norma de $H^1(\Omega)$:
+\[
+  \norm[H_0^1]{u} = \left(\int_{\Omega} \norm{\grad u}^2 \right)^{1/2}.
+\]
 
 %----------------------------------------------------
 \section{El Problema de Poisson--Dirichlet Unidimensional}
