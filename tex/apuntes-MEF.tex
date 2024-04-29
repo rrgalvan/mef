@@ -65,7 +65,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Párrafos
 \setcounter{secnumdepth}{5}
 \newcounter{stepnum}[section]
-\newcommand{\step}{\bigskip\noindent\textbf{\thesection.\refstepcounter{stepnum}\thestepnum}.\enspace}
+\newcommand{\step}[1][]{\bigskip\noindent\textbf{\thesection.\refstepcounter{stepnum}\thestepnum}.\enspace{#1}}
 
 \newcommand{\deff}[1]{\textit{\textbf{#1}}}
 
@@ -226,12 +226,16 @@ Algunas propiedades:
 \begin{itemize}
   \item 
 Si $f^2$ es integrable Riemmann, entonces $f\in L^2(\Omega)$. En particular, toda función continua y acotada en $\Omega$ es integrable y en este sentido $C^(\overline\Omega)\subset L^2(\Omega)$.
-  \item El conjunto $L^p(\Omega)$ se generaliza a funciones con valores en $\R^d$, sin más que considerar en~\eqref{producto.escalar.L2} el producto escalar en $\R^d$ (al multiplicar $f\cdot g$).
+  \item El conjunto $L^p(\Omega)$ se generaliza a funciones con valores en $\R^d$, sin más que considerar en~\eqref{producto.escalar.L2} el producto escalar en $\R^d$.
 \end{itemize}
 
 %- - - - - - - - - - - - - - - - - - - - - - - - - 
 \subsection*{Espacios de Sobolev}
 %- - - - - - - - - - - - - - - - - - - - - - - - - 
+El resto de esta sección debe verse como una introducción rápida y superficial a algunos resultados de análisis funcional que no son, en absoluto, evidentes. Con el fin de tratar solamente los conceptos que serán necesarios en las próximas secciones, se han evitado algunos de ellos, como la teoría de distribuciones, que habrían sido más generales y dotado de más rigor a los contenidos. Se recomienda profudizar en esta fascinante teoría matemática, por ejemplo a través de los libros de J. Sayas et al~\cite{sayas2019variational} o el clásico de Adams et al~\cite{adams2003sobolev}.
+
+\step[Fórmulas de integración por partes].
+
 \step 
 Definimos el \deff{soporte} de una función $\varphi:\Omega\to\R $ como el conjunto
 \[
@@ -243,7 +247,7 @@ donde $\overline A$ denota a la clausura de un conjunto $A$ cualquiera en $\R$.
 Denotamos por $\TestSpace(\Omega)$ al espacio de funciones%
 %
 \footnote{
-  Como ejercicio, se puede comprobar que la función $g(x)=\exp(1/(x^2-1))$ si $|x|\le 1$, $g(x)=0$ si $|x|> 1$, es de $C^\infty$ y $\mathop{\rm sop}(g) = [-1,1]$, por tanto $g\in\TestSpace(\R)$. Pueden consultarse más ejemplos de funciones de $\TestSpace(\Omega)$,  por ejemplo, en~\cite{adams2003sobolev,sayas2019variational}.
+  Como ejercicio, se puede comprobar que la función $g(x)=\exp(1/(x^2-1))$ si $|x|\le 1$, $g(x)=0$ si $|x|> 1$, es de $C^\infty(\R)$ y $\mathop{\rm sop}(g) = [-1,1]$. Por tanto $g\in\TestSpace(\R)$ y $g\in\TestSpace(\Omega)$ para todo $\Omega=(a,b)\subset\R$ tal que $[-1,1]\subset(a,b)$.  Pueden consultarse más ejemplos de funciones de $\TestSpace(\Omega)$,  por ejemplo, en~\cite{adams2003sobolev,sayas2019variational}.
 }
 %
 infinitamente derivables cuyo soporte es un compacto contenido en $\Omega$. 
@@ -261,23 +265,28 @@ Sea $u\in L^2(\Omega)$. Decimos que $u$ es \deff{derivable en sentido débil}  (
 \[
   \int_\Omega v\, \varphi\; = -\int_\Omega u \, \partial_{x_i} \varphi \quad \forall \varphi \in \TestSpace(\Omega).
 \]
-En este caso, decimos que $v$ es la \deff{derivada débil} de u y la denotamos como a la derivada convencional: $v=\partial_{x_i}u$ o $v=u_{x_i}$ o $v=\partial u/\partial{x_i}$ o $v=D_i u$. 
+En este caso, decimos que $v$ es la \deff{derivada débil} de $u$ con respecto a $x_i$ y la denotamos del mismo modo que a la derivada convencional: $v=\partial_{x_i}u$ o $v=u_{x_i}$ o $v=\partial u/\partial{x_i}$ o $v=D_i u$. 
 
 Operadores usuales como el vector \deff{gradiente} o el operador \deff{divergencia} se generalizan a derivadas débiles. La idea de derivada débil se generaliza al concepto más elebante de de distribuciones~\cite{adams2003sobolev}.
 
-\begin{properties}%
-\footnote{Ver, por ejemplo,~\cite{adams2003sobolev}.}
+\step[\textbf{Propiedades} de la derivada débil.]%
+%
+\footnote{Parea más detalles, demostaciones, etc, ver, por ejemplo,~\cite{adams2003sobolev}.}
+%
 \begin{enumerate}
-  \item La derivada débil es única salvo conjuntos de medida nula. Por tanto, la derivada débil de $u\in L^2(\Omega)$ con respecto a la variable $x_i$ es la única función $u_{x_i}\in L^2(\Omega)$ que se caracteriza por:
+  \item La derivada débil es única salvo conjuntos de medida nula. Así, si existe la derivada débil de $u\in L^2(\Omega)$ con respecto  $x_i$, ésta es la única función $u_{x_i}\in L^2(\Omega)$tal que: 
 \[
   \int_\Omega u_{x_i} \, \varphi\; = -\int_\Omega u\, \varphi_{x_i} \quad \forall \varphi \in \TestSpace(\Omega).
 \]
 
-  \item Si una función es derivable en sentido clásico, entonces existe su derivada débil y coincide (c.p.d.) con la clásica. En efecto, basta aplicar la fórmula de integración 
+\item Si una función es derivable en sentido clásico, entonces existe su derivada débil y coincide (c.p.d.) con la clásica. En efecto, si $u\in C^1(\Omega)$,  basta aplicar la fórmula de integración por partes para tener que, con cualquier $\varphi\in D(\Omega)$,
+  \[
+    \int_\Omega \frac{\partial u(\xx)}{\partial x_i}\, \varphi(\xx)\; d \xx = -\int_\Omega u(\xx)\, \frac{\partial\varphi(\xx)}{\partial x_i} d\xx.
+  \]
 
   \item  Las reglas clásicas para las derivadas de sumas y productos de funciones también son válidas para la derivada débil
 \end{enumerate}
-\end{properties}
+
 Existen funciones que son derivables en sentido débil pero no en sentido clásico. Por ejemplo, si $u(x)=|x|$ en $\Omega=(-1,1)\subset\R$, entonces 
     \[
       \partial_x u =u'(x)=  \left\{\begin{aligned}-1 & \quad\text{si } x\le 0,\\ 1 &\quad\text{si } x>0. \end{aligned}\right.
@@ -309,8 +318,8 @@ Consideremos la siguiente función, a la que llamamos \deff{función traza} sobr
 \]
 que asocia a cada función de $u\in C^0(\overline\Omega)$ su restricción a $\partial\Omega$, $\gamma(u)=u|_{\partial\Omega}$.
 .
-El siguiente resultado, una de las claves en la teoría de espacios de Sobolev, garantiza que se puede definir también una la restricción a la frontera
-%%
+El siguiente resultado, una de las claves en la teoría de espacios de Sobolev, garantiza que se puede definir también una la restricción a la frontera%
+%
 \footnote{Obsérvese que la frontera es un conjunto de medida nula, por tanto no tendría sentido el definir la restricción a $\partial\Omega$ de funciones medibles Lebesgue (y por tanto definida c.p.t. $\xx\in\Omega$).\par 
 Por otra parte, es necesario dotar de sentido preciso al espacio $L^2(\partial\Omega)$, ver por ejemplo~\cite{sayas2019variational}.}
 %%
