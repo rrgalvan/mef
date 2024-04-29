@@ -330,26 +330,26 @@ $$H_0^1(\Omega) = \overline{C_0^\infty(\Omega)}^{H^1(\Omega)},$$ clausura respec
 \section{El Problema de Poisson--Dirichlet Unidimensional}
 %----------------------------------------------------
 
-Comenzaremos en el caso $d=1$, con un dominio $\Omega=(a,b)\subset\R$, $a,b\in\R$. Nos centraremos en el caso particular de~\eqref{eq:problema.modelo} en que $\Gamma_N=\emptyset$, obteniendo el siguiente problema de Poisson-Dirichlet: 
+Comenzaremos considerando particular de~\eqref{eq:problema.modelo} en el que $d=1$, siendo $\Omega=(a,b)\subset\R$, $a,b\in\R$, y con condiciones de contorno Dirichlet homogéneas. Es decir, $\Gamma_D=\{a,b\}$ y $\Gamma_N=\emptyset$. Tenemos así el siguiente problema de Poisson-Dirichlet: 
 \begin{equation}
   \left\{
     \begin{aligned}
       - \uxx &= f \en{\Omega}, \\
-      u&=g_D \sobre{\Gamma_D}, \\
+      u&=0 \sobre{\Gamma_D}, \\
     \end{aligned}
   \right.
   \label{eq:problema.dirichlet.homogeneo.1d}
 \end{equation}
-donde denotamos $\uxx = d^2 u/d x^2$ y $\Gamma_D=\partial\Omega=\{a,b\}$. 
+siendo $\uxx = d^2 u/d x^2$ y $f\in C^0(\Omega)$. Una solución clásica será una función $u\in C^(\overline\Omega)\cap C^1(\Omega)$ para las que se verifica~\eqref{eq:problema.dirichlet.homogeneo.1d} de forma puntual, es decir $-u_{xx}(x)=f(x)$ para todo $x\in(a,b)$ y $u(a)=u(b)=0$.
 
 
 %----------------------------------------------------
 \section{Formulación Variacional}
 %----------------------------------------------------
 
-En este apartado se estudia una formulación alternativa para el problema~\eqref{eq:problema.dirichlet.homogeneo.1d}. Veremos que ésta permite establecer condiciones suficientes para la existencia y unicidad de solución, en un sentido débil. Soluciones débiles que, de hecho, serán soluciones clásicas siempre que los datos sean suficientemente regulares.
+En este apartado se estudia una formulación alternativa para el problema~\eqref{eq:problema.dirichlet.homogeneo.1d}. Veremos que ésta permite establecer condiciones suficientes para la existencia y unicidad de solución, en un sentido débil o más general que el de solución clásica. Estas soluciones débiles serán, de hecho, soluciones clásicas siempre que los datos sean suficientemente regulares.
 
-Como veremos luego, este tipo de formulación débil o variacional será la base sobre la que  se construye el método de los elementos finitos.
+Como veremos luego, este tipo de formulación débil o variacional es generalizable de forma sencilla a $d>1$, así como a  condiciones de contorno más generales. Y será la base sobre la que  se construye el método de los elementos finitos. 
 
 
 \step
@@ -376,19 +376,8 @@ donde denotamos
 \end{align}
 
 \step
-Para que la última integral esté bien definida, no es necesario que $f$ y $u$ sean funciones de $C^0([a,b])$: es suficiente que $f$ y $v$ sean funciones de $L^2(\Omega)$, el espacio vectorial de funciones de cuadrado integrable, véase%
-\footnote{De hecho, como se comenta en este apéndice, la expresión~\eqref{eq:producto.l2} es un producto escalar en $L^2(\Omega)$ y éste es un espacio de Hilbert, es cecir, un espacio normado que es completo  para la norma inducida por el producto escalar:
-\[
-  \norm[L^2(\Omega)]{v} = 
-  \big(
-   v, v
-  \big)^{1/2} =
-  \left(
-  \int_\Omega |v(x)|^2 \, dx
-  \right)^{1/2}.
-\]
-}
-el apéndice~\ref{sec:definiciones.basicas}.
+Para que la última integral esté bien definida, no es necesario que $f$ y $u$ sean funciones de $C^0([a,b])$: es suficiente que $f$ y $v$ sean funciones de $L^2(\Omega)$, el espacio vectorial de funciones de cuadrado integrable. 
+De hecho, la expresión~\eqref{eq:producto.l2} es un producto escalar en $L^2(\Omega)$. 
 
 Y para que la integral~\eqref{eq:forma.bilineal.a} esté bien definida, no es necesario que $u$ y $v$ sean funciones de $C^1(\Omega)$. Bastaría que tanto $u$ como $v$ tengan derivadas $u'$ y $v'$ en un sentido débil (ver apéndice~\ref{sec:definiciones.basicas}) y que $u',v'\in L^2(\Omega)$. Precisamente, al espacio de funciones de $L^2(\Omega)$ cuya derivada es también de $L^2(\Omega)$ lo denotamos\footnote{
   De nuevo, y aunque sea menos evidente, la expresión~\eqref{eq:forma.bilineal.a} es un producto escalar en $H^1(\Omega)$.
@@ -415,21 +404,6 @@ u \in V, \quad a(u,v) = (f,v) \quad \forall v\in V.
   \label{eq:formulacon.variacional.1d}
 \end{equation}
 
-
-%----------------------------------------------------
-\appendix
-%----------------------------------------------------
-
-\section{Definciones Básicas de Análisis Funcional}
-\label{sec:definiciones.basicas}
-
-\subsection{Normas y Productos Escalares}
-
-\subsection{Espacios de Banach y de Hilbert}
-
-\subsection{Formas bilineales. Cocertivididad. El teorema de Lax-Milgram}
-
-\subsection{Espacios de Sobolev}
 
 
 \bibliographystyle{unsrt}
