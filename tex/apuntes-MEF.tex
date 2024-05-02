@@ -29,6 +29,11 @@
 % \usepackage{psfrag}  % Gráficas (plot) en LaTeX
 % \usepackage{pgfplots} % Gráficas (plot) en LaTeX usando PGF
 
+% Cambiar el formato de la fecha, para usarlo como número de vesión
+\usepackage[yyyymmdd]{datetime}
+\renewcommand{\dateseparator}{.}
+\newdateformat{versiondate}{%
+Versión: \twodigit{\THEMONTH}.\twodigit{\THEDAY}\enspace(\twodigit{\THEYEAR})}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%% Page Setting 
 % \geometry{a4paper}
@@ -55,8 +60,6 @@
 \definecolor{deepBlue}{RGB}{61,124,222}
 \definecolor{shallowBlue}{RGB}{235,249,255}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%% Define an orangebox command 
-\newcommand\orangebox[1]{\fcolorbox{ocre}{mygray}{\hspace{1em}#1\hspace{1em}}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Plotting Settings 
 % \usepgfplotslibrary{colorbrewer}
@@ -66,6 +69,9 @@
 \setcounter{secnumdepth}{5}
 \newcounter{stepnum}[section]
 \newcommand{\step}[1][]{\bigskip\noindent\textbf{\thesection.\refstepcounter{stepnum}\thestepnum}.\enspace{#1}}
+
+\renewcommand{\theparagraph}{\arabic{section}.\arabic{paragraph}}
+\renewcommand{\step}[1][]{\paragraph{#1}\hspace{-1.1em}}
 
 \newcommand{\deff}[1]{\textit{\textbf{#1}}}
 
@@ -105,6 +111,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Title & Author 
 \title{Breve Introducción al Método de los Elementos Finitos para Problemas Elípticos}
 \author{J. Rafael Rodríguez Galván}
+\date{\versiondate\today}
 
 \begin{document}
 \maketitle
@@ -146,25 +153,41 @@ La idea de este método consiste en descomponer el dominio como unión de «elem
 En el caso $1$--dimensional y para $k=1$, éstas serán simplemente funciones poligonales. Pero, estas funciones, no son derivables en general. Entonces, ¿en qué sentido podemos decir que verifican~\eqref{eq:problema.modelo}? ¿Qué entendemos por derivada de una función poligonal? La respuesta está en los espacios de funciones derivables en un sentido débil que definiremos en el siguiente apartado.
 
 %----------------------------------------------------
-\section{Algunas Nociones de Análisis Funcional}
+\section{Algunas nociones de análisis funcional}
 %----------------------------------------------------
 \label{sec:análisis.funcional}
 
 Para las poder definir precisamente las herramientas matemáticas que son objeto de este documento, es conveniente repasar previamente una serie de conceptos básicos sobre espacios de funciones. Los resultados se enuncian sin demostración. Para ver más detalles, pueden consultarse por ejemplo~\cite{adams2003sobolev, sayas2019variational}. En lo que sigue, $\Omega$ denotará a un abierto acotado de $\R^d$, aunque muchos de los conceptos pueden extenderse a dominios no acotados.
 
 %- - - - - - - - - - - - - - - - - - - - - - - - - 
-\subsection*{Normas y Productos Escalares}
+\subsection*{Normas y productos escalares}
 %- - - - - - - - - - - - - - - - - - - - - - - - - 
 Sea $V$ un espacio vectorial sobre el cuerpo\footnote{Por supuesto, todos estos conceptos se generalizan a otros cuerpos como $\Q$} $\R$, finito o infinito dimensional, cuyos elementos estarán formados por funciones. Por ejemplo, $V=\P_2[x]$, el conjunto de los polinomios con coeficientes reales de grado menor o igual a $2$, o $V=C(0,1)$ (funciones continuas en el intervalo $(0,1)$). Las siguientes afirmaciones generalizan los conceptos básicos en espacios vectoriales  
 
 \step 
 Un \deff{espacio normado} es cualquier  espacio vectorial $V$ dotado de una \deff{norma}, es decir de una aplicación $\norm[V]{\cdot}$: $v\in V \longmapsto \norm[V]{v}\in\R_+$ tal que: (1) $\norm[V]{v}=0 \Leftrightarrow v=0$, (2) $\norm[V]{\lambda \cdot v}=|\lambda|\cdot\norm[V]{v}$, para todos $\lambda\in\R$, $v\in V$ y (3) $\norm[V]{v+w}\le \norm[V]{v}+\norm[V]{w}$  para todos $v, w\in V$.
 
-\step Un \deff{producto escalar} sobre $V$ es una aplicación bilineal (lineal en sus dos variables),
+\step Dos \deff{normas equivalentes} en $V$ son todas aquellas $\norm[(1)]{\cdot}$ y  $\norm[(2)]{\cdot}$ tales que existen $C_1, C_2>0$ para las que
+\[
+  \norm[(2)]{v} \le C_1\norm[(1)]{v} \quad{y}\quad \norm[(1)]{v} \le C_2\norm[(2)]{v}, \quad \forall v\in V.
+\]
+En espacios finito-dimensionales, todas las normas son equivalentes, pero no en espacios de dimensión infinita.
+
+\step Dados dos espacios normados $V$ y $W$, una aplicación lineal $L:V\to W$, $v\in V\mapsto Lv=L(v)\in W$, es continua si existe $C>0$ tal que $\norm[W]{Lv} \le C \norm[V]{v}$ para todo $v\in V$.
+
+Se denota por $\mathcal{L}(V,W)$ al conjunto de todas las aplicaciones lineales y continuas de $V$ en $W$. Este conjunto es un espacio vectorial y a sus elementos se les llama \deff{operadores} (lineales).
+
+\step Una \deff{forma bilineal} sobre $V\times W$ es una aplicación $a:(v,w)\in V\times W \mapsto a(v,w)\in\R$ que es lineal y continua para cada una de sus dos componentes. Es decir, existe $C>0$ tal que:
+\[
+  a(v,w) \le C \norm[V]{v}\,\norm[W]{w} \quad\forall (v,w)\in V\times W.
+\]
+
+\step Un \deff{producto escalar} sobre $V$ es una forma bilineal 
 \[
   (\cdot,\cdot)_V: (v,w)\in V\times V \longmapsto (v,w)_V\in\R
 \]
 tal que, para todos $v,w\in V$: (1) $(v,w)_V=(w,v)_V$  (2) $(v,v)\ge 0$ y (3) $(v,v)=0 \Leftrightarrow v=0$.
+
 
 \step 
 % \begin{proposition}
@@ -182,16 +205,20 @@ y además se verifica la desigualdad de \textit{\textbf{Cauchy-Schwarz}}:
 Se llama \deff{espacio de Banach} a todo espacio normado $V$ que es completo, es decir, tal que toda sucesión de Cauchy es convergente (para $\norm[V]{\cdot}$) y su límite está en $V$.
 
 \step 
-Dados dos espacios normados, $V$ y $W$, se denota por $\mathcal{L}(V,W)$ al conjunto de todas las funciones lineales de $V$ en $W$. Este conjunto es un espacio vectorial y a sus elementos, $A:V\to W$, se les llama \deff{operadores} (lineales).
-
-\step 
 Se denomina \deff{espacio de Hilbert} a todo aquel espacio vectorial $V$ dotado de un producto escalar y tal que $V$ es completo para la norma subordinada (por tanto, todo espacio de Hilbert es un espacio de Banach). 
+
+\step 
+Se verifica la siguiente propiedad: todo subespacio vectorial cerrado de un espacio de Hilbert también un espacio de Hilbert para el mismo producto escalar. 
+
 %- - - - - - - - - - - - - - - - - - - - - - - - - 
-\subsection*{Espacios de Funciones Lebesgue-Integrables}
+\subsection*{Espacios de funciones Lebesgue-integrables}
 %- - - - - - - - - - - - - - - - - - - - - - - - - 
 
 \step 
-Denotamos por $L^1(\Omega)$ al espacio de funciones de $\Omega$ en $\R$ que son integrables en el sentido de Lebesgue. Y más en general, dado $p\in [1,+\infty)$, denotamos
+Denotamos por $L^1(\Omega)$ al espacio de funciones de $\Omega$ en $\R$ que son integrables en el sentido de Lebesgue%
+\footnote{Se prefiere usar integrales de Lebesgue por motivos de completitud, es decir, porque bajo hipóteis razonables el límite de funciones integrables es integrable. Esto no ocurre con la integral de Riemann. Véase~\cite{Brenner-Scott:08}, sección 1.1, para un ejemplo motivador.}
+%
+. Y más en general, dado $p\in [1,+\infty)$, denotamos
 \begin{equation*}
   L^p(\Omega) = \big\{ f:\Omega \to \R \ /\ \norm[L^p(\Omega)]{f} < +\infty \big\},
 \end{equation*}
@@ -225,16 +252,54 @@ cuya norma asociada es
 Algunas propiedades:
 \begin{itemize}
   \item 
-Si $f^2$ es integrable Riemmann, entonces $f\in L^2(\Omega)$. En particular, toda función continua y acotada en $\Omega$ es integrable y en este sentido $C^(\overline\Omega)\subset L^2(\Omega)$.
+Si $f^2$ es integrable Riemmann, entonces $f\in L^2(\Omega)$. En particular, toda función continua y acotada en $\Omega$ es integrable y en este sentido $C^0(\overline\Omega)\subset L^2(\Omega)$.
   \item El conjunto $L^p(\Omega)$ se generaliza a funciones con valores en $\R^d$, sin más que considerar en~\eqref{producto.escalar.L2} el producto escalar en $\R^d$.
 \end{itemize}
 
 %- - - - - - - - - - - - - - - - - - - - - - - - - 
-\subsection*{Espacios de Sobolev}
+\subsection*{Derivadas débiles y espacios de Sobolev}
 %- - - - - - - - - - - - - - - - - - - - - - - - - 
-El resto de esta sección debe verse como una introducción rápida y superficial a algunos resultados de análisis funcional que no son, en absoluto, evidentes. Con el fin de tratar solamente los conceptos que serán necesarios en las próximas secciones, se han evitado algunos de ellos, como la teoría de distribuciones, que habrían sido más generales y dotado de más rigor a los contenidos. Se recomienda profudizar en esta fascinante teoría matemática, por ejemplo a través de los libros de J. Sayas et al~\cite{sayas2019variational} o el clásico de Adams et al~\cite{adams2003sobolev}.
+El resto de esta sección debe verse como una introducción rápida y superficial a algunos resultados de análisis funcional que no son, en absoluto, evidentes. Con el fin de tratar solamente los conceptos que serán necesarios en las próximas secciones, se han evitado algunos de ellos, como la teoría de distribuciones, que habrían sido más generales y dotado de más rigor a los contenidos. Se recomienda profundizar en esta fascinante teoría matemática, por ejemplo a través de los libros de J. Sayas et al~\cite{sayas2019variational} o el clásico de Adams et al~\cite{adams2003sobolev}.
 
-\step[Fórmulas de integración por partes].
+\step[\textbf{Fórmulas de integración por partes}].
+La siguiente identidad se puede demostrar en un sentido clásico y en una amplia familia de dominios $\Omega$ acotados, en particular en dominios con frontera poligonal a trozos como los que utilizaremos al aplicar el método de los elementos finitos. Puede accederse a una demostración, por ejemplo, en~\cite{sayas2019variational}.
+Si $f\in C^1(\overline\Omega)$, entonces
+\begin{equation}
+  \label{eq:partes.1}
+  \int_\Omega \partial_{x_i} f(\xx) \, d\xx =
+  \int_{\partial\Omega} f(\xx)\,n_i \, dS,
+\end{equation}
+donde para todo $\xx\in\partial\Omega$, $\nn=\nn(\xx)=(n_1,\dots,n_d)$ es el vector normal unitario orientado al exterior de $\Omega$.
+Si $f,g\in C^1(\overline\Omega)$, aplicando~\eqref{eq:partes.1} al producto $f\cdot g$ 
+% y usando que $\partial_{x_i} (f\cdot g) = (\partial_{x_i}f)\cdot g+f\cdot(\partial_{x_i}g)$, 
+se tiene la fórmula de integración por partes
+\begin{equation}
+  \label{eq:partes.2}
+  \int_\Omega \partial_{x_i}f(\xx)\cdot g(\xx) \, d\xx    =
+  - \int_\Omega f(\xx)\cdot \partial_{x_i}g(\xx) \, d\xx    
+  +
+  \int_{\partial\Omega} f(\xx)g(\xx)\,n_i \, dS.
+\end{equation}
+% Sea ahora $\ff=(f_1,\dots,f_d)\in C^1(\overline\Omega; \R^d)$ y sea $\div \ff = \partial_{x_1} f_1 + \cdots + \partial_{x_d} f_d$ la \deff{divergencia} de $\ff$. Sumando la ecuación \eqref{eq:partes.1} para $i=1,\dots,d$, se tiene el teorema de la divergencia:
+% \[
+%   \int_\Omega \div\ff (\xx) \,\dx = 
+%   \int_{\partial\Omega} \ff(\xx)\cdot\nn \, dS.
+% \]
+Aplicando la misma idea para el producto $\partial_{x_i} f \cdot g$, y sumando el resultado para $i=1,\dots d$, se tiene la siguiente fórmula de integración por partes, conocida como \textbf{fórmula de Green}:
+\begin{equation}
+\label{eq:green}
+\int_\Omega \Delta f(\xx)\, g(\xx) \, d\xx =
+- \int_\Omega \nabla f(\xx)\, \nabla g(\xx) \, d\xx
++ \int_{\partial\Omega} (\nabla f(\xx)\cdot\nn)\, g(\xx)  \, dS.
+\end{equation}
+\step
+La identidad\eqref{eq:partes.2} implica que la derivada de toda $f\in C^1(\overline\Omega)$ verifica la siguiente propiedad:
+\begin{equation}
+  \label{eq:partes.3}
+  \int_\Omega \partial_{x_i}f(\xx)\cdot \varphi(\xx) \, d\xx    =
+  - \int_\Omega f(\xx)\cdot \partial_{x_i}\varphi(\xx) \, d\xx    \quad \forall \varphi\in C^1(\overline\Omega)  \ / \ \varphi=0 \text{ sobre }\partial\Omega.
+\end{equation}
+Pero esta identidad tiene sentido sin más que asumir que las funciones $f$ y $g$, así como sus derivadas, sean funciones de $L^2(\Omega)$. Utilizaremos este hecho para generalizar el concepto de derivada.
 
 \step 
 Definimos el \deff{soporte} de una función $\varphi:\Omega\to\R $ como el conjunto
@@ -254,45 +319,42 @@ infinitamente derivables cuyo soporte es un compacto contenido en $\Omega$.
 \[
   \TestSpace(\Omega) = \big\{\varphi\in C^\infty(\Omega) \ /\ \mathop{\rm sop}(\varphi) \text{ es compacto y }\mathop{\rm sop}(\varphi)\subset\Omega \big\}.
 \]
-Obsérvese que toda función de $\TestSpace(\Omega)$ es cero «en las cercanías%
+No es difícl demostrar que toda función de $\TestSpace(\Omega)$ es cero «en las cercanías%
 %
-\footnote{Para cualquier punto $\xx_0\in\partial\Omega$, existe una bola $B_{\xx_0}$ tal que $\varphi\equiv 0$ sobre $B_{\xx_0}\cap\Omega.$}
+% \footnote{Para cualquier punto $\xx_0\in\partial\Omega$, existe una bola $B_{\xx_0}$ tal que $\varphi\equiv 0$ sobre $B_{\xx_0}\cap\Omega.$}
+\footnote{Si $\varphi\in \TestSpace(\Omega)$, entonces existe un abierto $\Omega_0$ tal que $\mathop{\rm sop}(\varphi)\subset\overline\Omega_0\subset\Omega$ y por tanto $\varphi|_{\partial\Omega_0}=0$.}
 %
-de $\partial\Omega$.
+de $\partial\Omega$. Ahora estamos en disposición de dar sentido a una fórmula de integración por partes similar a~\eqref{eq:partes.3} que usaremos para generalizar el concepto de derivada.
 
 \step
-Sea $u\in L^2(\Omega)$. Decimos que $u$ es \deff{derivable en sentido débil}  (con respecto a la variable $x_i$) si existe alguna función $v\in L^2(\Omega)$ tal que
+Decimos que una función $u\in L^2(\Omega)$ es \deff{derivable en sentido débil}  (en $L^2(\Omega)$ y con respecto a la variable $x_i$) si existe alguna función $v\in L^2(\Omega)$ tal que
 \[
   \int_\Omega v\, \varphi\; = -\int_\Omega u \, \partial_{x_i} \varphi \quad \forall \varphi \in \TestSpace(\Omega).
 \]
 En este caso, decimos que $v$ es la \deff{derivada débil} de $u$ con respecto a $x_i$ y la denotamos del mismo modo que a la derivada convencional: $v=\partial_{x_i}u$ o $v=u_{x_i}$ o $v=\partial u/\partial{x_i}$ o $v=D_i u$. 
 
-Operadores usuales como el vector \deff{gradiente} o el operador \deff{divergencia} se generalizan a derivadas débiles. La idea de derivada débil se generaliza al concepto más elebante de de distribuciones~\cite{adams2003sobolev}.
+Operadores usuales como el vector \deff{gradiente} o el operador \deff{divergencia} se generalizan a derivadas débiles. La idea de derivada débil se generaliza al concepto más elegante de de distribuciones~\cite{adams2003sobolev}.
 
 \step[\textbf{Propiedades} de la derivada débil.]%
 %
 \footnote{Parea más detalles, demostaciones, etc, ver, por ejemplo,~\cite{adams2003sobolev}.}
 %
 \begin{enumerate}
-  \item La derivada débil es única salvo conjuntos de medida nula. Así, si existe la derivada débil de $u\in L^2(\Omega)$ con respecto  $x_i$, ésta es la única función $u_{x_i}\in L^2(\Omega)$tal que: 
+  \item La derivada débil es única salvo conjuntos de medida nula. Esto es, si existe la derivada débil de $u\in L^2(\Omega)$ con respecto  $x_i$, ésta es la única función $u_{x_i}\in L^2(\Omega)$ tal que: 
 \[
   \int_\Omega u_{x_i} \, \varphi\; = -\int_\Omega u\, \varphi_{x_i} \quad \forall \varphi \in \TestSpace(\Omega).
 \]
-
-\item Si una función es derivable en sentido clásico, entonces existe su derivada débil y coincide (c.p.d.) con la clásica. En efecto, si $u\in C^1(\Omega)$,  basta aplicar la fórmula de integración por partes para tener que, con cualquier $\varphi\in D(\Omega)$,
-  \[
-    \int_\Omega \frac{\partial u(\xx)}{\partial x_i}\, \varphi(\xx)\; d \xx = -\int_\Omega u(\xx)\, \frac{\partial\varphi(\xx)}{\partial x_i} d\xx.
-  \]
-
-  \item  Las reglas clásicas para las derivadas de sumas y productos de funciones también son válidas para la derivada débil
+\item Si una función es derivable en sentido clásico, entonces existe su derivada débil y coincide (c.p.d.) con la clásica. Esta es una consecuencia directa de~\eqref{eq:partes.3}. 
+  \item  Las reglas clásicas para las derivadas de sumas y productos de funciones también son válidas para la derivada débil.
 \end{enumerate}
 
-Existen funciones que son derivables en sentido débil pero no en sentido clásico. Por ejemplo, si $u(x)=|x|$ en $\Omega=(-1,1)\subset\R$, entonces 
+\step
+Existen funciones que son derivables en sentido débil pero no en sentido clásico. Por ejemplo, la función $u(x)=|x|$ en $\Omega=(-1,1)\subset\R$ es derivable en sentido débil, siendo\footnote{Se recomienda comprobarlo como ejercicio.} 
     \[
       \partial_x u =u'(x)=  \left\{\begin{aligned}-1 & \quad\text{si } x\le 0,\\ 1 &\quad\text{si } x>0. \end{aligned}\right.
     \]
 
-Nota: se puede demostrar que esta última función no (por ser discontinua y $d=1$) no es derivable en sentido débil. Por tanto no existe una «segunda derivada débil» de $u(x)=|x|$.
+    Nota: se puede demostrar que esta última función, $u'(x)$, no es derivable en sentido débil\footnote{En el caso $d=1$, todas las funciones con derivada débil en $L^2(\Omega)$ son continuas.}. Por tanto no existe una «derivada segunda en sentido débil» de $u(x)=|x|$. 
 
 \step
 Definimos el \deff{espacio de Sobolev} $H^1(\Omega)$ como el conjunto de las funciones que tienen todas sus derivadas débiles en $L^2(\Omega)$, esto es
@@ -303,28 +365,37 @@ Definimos el \deff{espacio de Sobolev} $H^1(\Omega)$ como el conjunto de las fun
 \step 
 $H^1(\Omega)$ es un espacio de Hilbert (y por tanto un espacio norrmado completo) para el producto escalar
 \[
-  (u,v)_{H^1(\Omega)} = (u,v)_{L^2(\Omega)} + (\grad u, \grad v)_{L^2(\Omega)}.
+  (u,v)_{H^1(\Omega)} = (u,v)_{L^2(\Omega)} + (\grad u, \grad v)_{L^2(\Omega)},
 \]
-
-\step Puesto que las funciones de $C^1(\overline\Omega)$ y sus derivadas son de $L^2(\Omega)$,   
+cuya norma subordinada es
+\[
+  \norm[H^1(\Omega)]{v} = \left(\int_{L^2(\Omega)}v^2 +
+  \int_{L^2(\Omega)} |\grad v|^2\right)^{1/2}.
+\]
+\step Puesto que las funciones de $C^1(\overline\Omega)$ y sus derivadas son de $L^2(\Omega)$, se tiene que   
 \[
 C^1(\overline\Omega) \subset H^1(\Omega).
 \]
 
 \step 
-Consideremos la siguiente función, a la que llamamos \deff{función traza} sobre $\partial\Omega$:
+Consideremos la siguiente función, a la que llamamos \deff{función traza} sobre% 
+\footnote{El concepto de traza se puede extender a otras regiones de la frontera, $\gamma:C^0(\Omega) \to C^0(\Gamma)$, con $\Gamma\subset\partial\Omega$.}
+%
+$\partial\Omega$:
 \[
   \gamma:C^0(\overline\Omega) \to C^0(\partial\Omega),
 \]
 que asocia a cada función de $u\in C^0(\overline\Omega)$ su restricción a $\partial\Omega$, $\gamma(u)=u|_{\partial\Omega}$.
-.
+
 El siguiente resultado, una de las claves en la teoría de espacios de Sobolev, garantiza que se puede definir también una la restricción a la frontera%
 %
 \footnote{Obsérvese que la frontera es un conjunto de medida nula, por tanto no tendría sentido el definir la restricción a $\partial\Omega$ de funciones medibles Lebesgue (y por tanto definida c.p.t. $\xx\in\Omega$).\par 
 Por otra parte, es necesario dotar de sentido preciso al espacio $L^2(\partial\Omega)$, ver por ejemplo~\cite{sayas2019variational}.}
 %%
 de funciones de $H^1(\Omega)$. 
-En concreto, se puede demostrar (ver por ejemplo~\cite{sayas2019variational} el siguiente teorema: existe una función lineal y continua, a la que seguiremos llamando traza y denotando por $\gamma$,
+
+\step{\textbf{Teorema.}}\footnote{Ver por ejemplo~\cite{sayas2019variational} para una demostración.} 
+Existe una función lineal y continua, a la que seguiremos llamando traza y denotando por $\gamma$,
 \[
   \gamma:  H^1(\Omega) \to L^2(\partial\Omega),
 \]
@@ -335,24 +406,28 @@ que para funciones continuas coincide con la restricción a $\partial\Omega$, es
 Abusando del lenguaje, diremos que $u|_{\partial\Omega}=g$ si $\gamma(u)=g$.
 
 \step
-Denotamos por $H_0^1(\Omega)$ al núcleo de $\gamma$. Es decir:
+En el caso de condiciones de contorno Dirichlet (homogéneas y no homogéneas), serán muy importantes las funciones que \textit{son cero en la frontera}. Denotamos por $H_0^1(\Omega)$ al núcleo de $\gamma$. Es decir:
 \[
   H_0^1(\Omega) = \{ u\in H^1(\Omega) \ /\ \gamma(u)=0\}.
 \]
 
-\step Se verifica la siguiente propiedad: $\TestSpace(\Omega)\subset H_0^1(\Omega)$ y de hecho%
-%
+\step{\textbf{Teorema.}}%
 \footnote{El hecho de que los espacios de Sobolev pueden ser definidos por completitud no es evidente. Este fue el objeto de una curiosa publicación de sólo dos páginas con el intenioso título «$H=W$»~\cite{meyers1964h}.}
+Se verifica la siguiente propiedad: $\TestSpace(\Omega)\subset H_0^1(\Omega)$ y de hecho%
 $$H_0^1(\Omega) = \overline{\TestSpace(\Omega)}^{H^1(\Omega)},$$ clausura respecto a la norma de $H^1(\Omega)$.
 
-\step \textbf{Desigualdad de Poincaré-Friecrichs}: si $\Omega$ es acotado\footnote{Basta acotado en alguna dirección}, existe una constante $C>0$ tal que 
+\step{\textbf{Teorema (Desigualdad de Poincaré-Friedrichs).} Si $\Omega$ es acotado\footnote{Basta acotado en alguna dirección}, existe una constante $C>0$ tal que 
 \[
   \norm[\Omega]{u} \le C \norm[\Omega]{\grad u}, \quad\forall u\in H_0^1(\Omega).
 \]
 
-\step Consecuencia: la siguiente expresión define una norma en $H_0^1(\Omega)$ que, de hecho, es equivalente en este espacio a la norma de $H^1(\Omega)$:
+\step Consecuencia: la siguiente expresión define una norma en $H_0^1(\Omega)$, que es equivalente a la norma de $H^1(\Omega)$.
 \[
   \norm[H_0^1]{u} = \left(\int_{\Omega} \norm{\grad u}^2 \right)^{1/2}.
+\]
+Esta es la norma subordinada al siguiente producto escalar:
+\[
+  (u,v)_{H^0_1(\Omega)} = (\grad u, \grad v)_{L^2(\Omega)} = \int_{\Omega} \grad u \cdot \grad v
 \]
 
 %----------------------------------------------------
@@ -369,71 +444,108 @@ Comenzaremos considerando particular de~\eqref{eq:problema.modelo} en el que $d=
   \right.
   \label{eq:problema.dirichlet.homogeneo.1d}
 \end{equation}
-siendo $\uxx = d^2 u/d x^2$ y $f\in C^0(\Omega)$. Una solución clásica será una función $u\in C^(\overline\Omega)\cap C^1(\Omega)$ para las que se verifica~\eqref{eq:problema.dirichlet.homogeneo.1d} de forma puntual, es decir $-u_{xx}(x)=f(x)$ para todo $x\in(a,b)$ y $u(a)=u(b)=0$.
+siendo $\uxx = d^2 u/d x^2$ y $f\in C^0(\Omega)$. Una solución clásica será una función $u\in C^0(\overline\Omega)\cap C^2(\Omega)$ para las que se verifica~\eqref{eq:problema.dirichlet.homogeneo.1d} de forma puntual, es decir $-u_{xx}(x)=f(x)$ para todo $x\in(a,b)$ y $u(a)=u(b)=0$.
 
 
 %----------------------------------------------------
-\section{Formulación Variacional}
+\subsection{Formulación Variacional}
 %----------------------------------------------------
 
-En este apartado se estudia una formulación alternativa para el problema~\eqref{eq:problema.dirichlet.homogeneo.1d}. Veremos que ésta permite establecer condiciones suficientes para la existencia y unicidad de solución, en un sentido débil o más general que el de solución clásica. Estas soluciones débiles serán, de hecho, soluciones clásicas siempre que los datos sean suficientemente regulares.
+En este apartado se estudia una formulación alternativa para el problema~\eqref{eq:problema.dirichlet.homogeneo.1d}. Veremos que ésta permite establecer condiciones suficientes para la existencia y unicidad de solución en un sentido débil,  más general que el de solución clásica. Estas soluciones débiles serán, de hecho, soluciones clásicas siempre que los datos sean suficientemente regulares.
 
-Como veremos luego, este tipo de formulación débil o variacional es generalizable de forma sencilla a $d>1$, así como a  condiciones de contorno más generales. Y será la base sobre la que  se construye el método de los elementos finitos. 
+Como veremos luego, este tipo de formulación débil o variacional es generalizable de forma sencilla a dimensión $d>1$, así como a  condiciones de contorno más generales. Y será la base sobre la que  se construye el método de los elementos finitos. 
 
 
 \step
-Suponiendo que $u$ es una solución clásica del problema~\eqref{eq:problema.dirichlet.homogeneo.1d} y $v$ es una función de $C^1(\overline\Omega)$ tal que $v=0$ sobe $\Gamma_D$, basta integrar por partes para obtener:
+Supongamos que $u$ es una sjlución clásica del problema~\eqref{eq:problema.dirichlet.homogeneo.1d} y que $v$ es una función de $C^0(\overline\Omega)\cap C^1(\Omega)$ tal que $v=0$ sobe $\Gamma_D$. Entonces podemos aplicar la fórmula de Green de integración por partes~\eqref{eq:green}, obteniendo:
 \begin{equation*}
   \int_\Omega (-\uxx)\,v  = -  \int_a^b \uxx(x) v(x) \,dx = 
   \int_a^b u_x(x) v_x(x)\,dx - \big( u(b)v(b) - u(a)v(a)  \big).
 \end{equation*}
-Y usando que $v(a)=v(b)=0$ y que $-\uxx(x)=f(x)$ para todo $x\in(a,b)$:
+Usando que $v(a)=v(b)=0$ y que $-\uxx(x)=f(x)$ para todo $x\in(a,b)$:
 \[
   \int_a^b u_x(x) v_x(x)\,dx  = \int_a^b f(x) v(x) \, dx.
 \]
-Es decir, toda solución clásica $u$ de~\eqref{eq:problema.dirichlet.homogeneo.1d} verifica, para toda $v\in C^1(\overline\Omega)$ tal que $v(a)=v(b)=0$, una ecuación de la forma:
-\begin{equation}
-  a(u,v) = (f,v),
-\end{equation}
-donde denotamos
+Esta expresión la podemos denotar como
+\[
+  a(u,v)=L(v),
+\]
+para
 \begin{align}
   a(u,v)  &= \int_a^b u_x(x) v_x(x)\,dx,  
   \label{eq:forma.bilineal.a}
 \\
-  (f,v)  &= \int_a^b f(x) v(x) \, dx.
-  \label{eq:producto.l2}
+  L(v)  &= \int_a^b f(x) v(x) \, dx.
+  \label{eq:forma.lineal.L}
 \end{align}
 
-\step
-Para que la última integral esté bien definida, no es necesario que $f$ y $u$ sean funciones de $C^0([a,b])$: es suficiente que $f$ y $v$ sean funciones de $L^2(\Omega)$, el espacio vectorial de funciones de cuadrado integrable. 
-De hecho, la expresión~\eqref{eq:producto.l2} es un producto escalar en $L^2(\Omega)$. 
 
-Y para que la integral~\eqref{eq:forma.bilineal.a} esté bien definida, no es necesario que $u$ y $v$ sean funciones de $C^1(\Omega)$. Bastaría que tanto $u$ como $v$ tengan derivadas $u'$ y $v'$ en un sentido débil y que $u',v'\in L^2(\Omega)$. Precisamente, al espacio de funciones de $L^2(\Omega)$ cuya derivada es también de $L^2(\Omega)$ lo denotamos\footnote{
-  De nuevo, y aunque sea menos evidente, la expresión~\eqref{eq:forma.bilineal.a} es un producto escalar en $H^1(\Omega)$.
-} por $H^1(\Omega)$ y así podemos decir que~\eqref{eq:forma.bilineal.a} está bien definido para todos $u,v\in H^1(\Omega)$.
-
-
-
-%
-% \step
-% Como se detalla en el apéndice~\ref{sec:definiciones.basicas}, la expresión $(\cdot,\cdot)$ no es más que el producto escalar en $L^2(\Omega)$ (el espacio de funciones de cuadrado integrable). Por tanto,
-% \[
-%   
-% \]
-%
-% Y a su vez $a(\cdot,\cdot)$ es una forma bilineal en el espacio $H^1(\Omega)$ (el espacio de funciones de $L^2(\Omega)$ con derivadas débiles que son también funciones de $L^2(\Omega)$).
-%
-Por tanto, si definimos el espacio
-\begin{equation*}
-  V= H_0^1(\Omega) = \{v\in H^1(\Omega), \ /\ v(a)=v(b)=0\},
-\end{equation*}
-podemos decir que toda solución clásica $u$ de~\eqref{eq:problema.dirichlet.homogeneo.1d} verifica la siguiente propiedad:
+Así, hemos visto que toda solución clásica $u$ de~\eqref{eq:problema.dirichlet.homogeneo.1d} es en particular solución del siguiente problema sobre el espacio  $V^* = \{ v\in C^0(\overline\Omega)\cap C^1(\Omega) \ /\ v\in V^*,\  v(a)=v(b)=0\}$:
 \begin{equation}
-u \in V, \quad a(u,v) = (f,v) \quad \forall v\in V.
-  \label{eq:formulacon.variacional.1d}
+  \label{eq:problema.variacional.C1}
+\begin{aligned}
+  \text{Hallar }u\in V^*  \enspace\text{tal que:} \enspace
+a(u,v) = L(v), \quad \forall v\in V^*.
+\end{aligned}
 \end{equation}
 
+\step Sin embargo, a pesar de que el problema~\eqref{eq:problema.variacional.C1} es más débil que el original (pues la solución sólo requiere tener derivadas primeras), no podremos garantizar existencia y unicidad de solución, esencialmente debido a que el espacio $V^*$ no es completo para una norma adecuada%
+%
+\footnote{
+  Intuitivamente, podemos considerar $D(\Omega)\subset V^*$ pero recordemos que $\overline {D(\Omega)}^{H^1(\Omega)} = H_0^1(\Omega)$, un espacio más amplio que $V^*$.
+} 
+% 
+.
+De hecho, para espacios espacios de Hilbert (es decir, completos para la norma asociada a su producto escalar) tenemos un resultado muy potente que introduciremos en la siguiente proposición.
 
+\step 
+Decimos que una forma bilineal sobre $V\times V$ es \deff{elíptica} o \deff{coercitiva} si existe una constante $\alpha>0$ tal que
+\[
+  a(v,v) \ge \alpha \norm[V]{v}^2\quad\forall v\in V.
+\]
+
+\step{\textbf{Proposición (Lema de Lax-Milgram)}}\footnote{Puede consultarse una demostración en~\cite{adams2003sobolev, sayas2019variational}.}
+Sea $V$ un espacio de Hilbert y $a:V\times V\to\R$ una forma bilineal, continua y coercitiva. Entonces, para toda $L:V\to\R$ lineal y continua existe una única $u\in V$  tal que
+\[
+  a(u,v) = L(v) \quad\forall v\in V. 
+\]
+Además, esta solución verifica la siguiente estimación de tipo estabilidad\footnote{Cuya demostración es sencilla, se deja como ejercicio}:
+\[
+  \norm[V]{u}\le \frac 1 {\alpha}\;\sup_{0\neq v\in V}\frac{|a(u,v)|}{\norm[V]{v}}.
+\]
+
+\step 
+Nos proponemos, pues, escribir una formulación débil del problema~\eqref{eq:problema.dirichlet.homogeneo.1d} que se encuentre en las hipótesis del Lema de Lax-Milgram. Para ello basta observar que las aplicaciones $a(\cdot,\cdot)$ y $F(\cdot)$, definidas en~\eqref{eq:forma.bilineal.a} y~\eqref{eq:forma.lineal.L} tengan sentido es suficiente que $u,v\in H_0^1(\Omega)$ y que $f\in L^2(\Omega)$. 
+
+\step
+Planteamos, por tanto, el siguiente problema, al que llamamos \deff{problema variacional} asociado a~\eqref{eq:problema.dirichlet.homogeneo.1d}:
+\begin{equation}
+  \label{eq:problema.variacional.1d}
+  \text{Hallar }u\in V=H_0^1(\Omega)  \enspace\text{tal que} \enspace
+  a(u,v) = F(v), \quad \forall v\in H_0^1(\Omega),
+\end{equation}
+con $a(\cdot,\cdot)$ y $F(\cdot)$, definidas en~\eqref{eq:forma.bilineal.a} y~\eqref{eq:forma.lineal.L}.
+
+
+\step{\textbf{Proposición}.} Para todo $f\in L^2(\Omega)$, existe una única solución del problema~\eqref{eq:problema.variacional.1d}, que verifica la siguiente acotación de estabilidad:
+\[
+  \norm[H_0^1]{u}\le \frac 1 {\alpha}\; \norm[L^2(\Omega)]{f}.
+\]
+
+\begin{proof}
+  Idea:
+  \begin{enumerate}
+    \item $V=H_0^1(\Omega)$ es un espacio de Hilbert para el producto escalar $(\cdot,\cdot)_{H^1(\Omega)}$, pues son, respectivamente, una forma bilineal y una aplicación lineal 
+    \item $a(\cdot,\cdot)$ y $L(\cdot)$ son respectivamente, una forma bilineal continua y una alicación lineal continua sobre $V$.
+    \item La forma bilineal $a(\cdot,\cdot)$ es coercitiva.
+    \item Podemos aplicar Lema de Lax-Milgram y concluir las tesis enunciadas en la proposición. 
+  \end{enumerate}
+\end{proof}
+
+\step{\textbf{Proposición}.}
+Si los datos son suficiente regulares ($f\in C^(\Omega)$), entonces la solución débil es una solución clásica del problema~\eqref{eq:problema.dirichlet.homogeneo.1d}.
+
+\section{El Método de los Elementos Finitos}
 
 \bibliographystyle{unsrt}
 \bibliography{biblio}
