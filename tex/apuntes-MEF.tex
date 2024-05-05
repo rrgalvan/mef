@@ -522,30 +522,57 @@ Planteamos, por tanto, el siguiente problema, al que llamamos \deff{problema var
 \begin{equation}
   \label{eq:problema.variacional.1d}
   \text{Hallar }u\in V=H_0^1(\Omega)  \enspace\text{tal que} \enspace
-  a(u,v) = F(v), \quad \forall v\in H_0^1(\Omega),
+  a(u,v) = F(v) \quad \forall v\in H_0^1(\Omega),
 \end{equation}
 con $a(\cdot,\cdot)$ y $F(\cdot)$, definidas en~\eqref{eq:forma.bilineal.a} y~\eqref{eq:forma.lineal.L}.
 
 
-\step{\textbf{Proposición}.} Para todo $f\in L^2(\Omega)$, existe una única solución del problema~\eqref{eq:problema.variacional.1d}, que verifica la siguiente acotación de estabilidad:
-\[
-  \norm[H_0^1]{u}\le \frac 1 {\alpha}\; \norm[L^2(\Omega)]{f}.
-\]
+\step{\textbf{Proposición}.} Para todo $f\in L^2(\Omega)$, existe una única solución del problema variacional~\eqref{eq:problema.variacional.1d}, que verifica la siguiente acotación de estabilidad:
+\begin{equation}
+  \label{eq:Lax-Milgram.estimación}
+  \norm[H_0^1]{u}\le \frac C {\alpha}\; \norm[L^2(\Omega)]{f},
+\end{equation}
+donde  $\alpha>0$ y $C>0$ son, respectivamente, las constantes de coercitividad y de la desigualdad de Poincaré-Friedrichs.
 
 \begin{proof}
   Idea:
   \begin{enumerate}
-    \item $V=H_0^1(\Omega)$ es un espacio de Hilbert para el producto escalar $(\cdot,\cdot)_{H^1(\Omega)}$, pues son, respectivamente, una forma bilineal y una aplicación lineal 
-    \item $a(\cdot,\cdot)$ y $L(\cdot)$ son respectivamente, una forma bilineal continua y una alicación lineal continua sobre $V$.
-    \item La forma bilineal $a(\cdot,\cdot)$ es coercitiva.
-    \item Podemos aplicar Lema de Lax-Milgram y concluir las tesis enunciadas en la proposición. 
+    \item Consideremos el espacio $V=H_0^1(\Omega)$, que es un espacio de Hilbert para el producto escalar $(\cdot,\cdot)_{H^1(\Omega)}$, pues es un subespacio cerrado del espacio de Hilbert $H^1(\Omega)$. 
+    \item $a(\cdot,\cdot)$ y $L(\cdot)$ son respectivamente, una forma bilineal continua y una alicación lineal continua sobre $V$. Esto es evidente usando la desigualdad de Cauchy-Schwarz y teniendo en cuenta la norma $\norm[H_0^1(\Omega)]{\cdot}$ (que es equivalente a la $\norm[H^1(\Omega)]{\cdot}$.
+    \item La forma bilineal $a(\cdot,\cdot)$ es coercitiva. De hecho, por definición, $a(v,v)=\norm[H_0^1(\Omega)]{v}^2$ para todo $v\in V$. Podemos tomar la constante de coercitividad $\alpha=1$.
+  \item Por tanto podemos aplicar Lema de Lax-Milgram, de donde existe una única solución de~\eqref{eq:problema.variacional.1d}.Aplicaremos~\eqref{eq:Lax-Milgram.estimación} y, consecutivamente: (1) $a(u,v)=(f,v)_{L^2(\Omega)}$ para todo $v\in V$, (2) la desigualdad de Cauchy-Schwarz y (3) la desigualdad de Poincaré-Friedrichs (con constante $C>0$):
+      \begin{align*}
+        \norm[V]{u} \le 
+        \frac 1 {\alpha}\;\sup_{0\neq v\in V}\frac{|a(u,v)|}{\norm[V]{v}} =
+        \frac 1 {\alpha}\;\sup_{0\neq v\in V}\frac{|(f,v)_{L^2(\Omega)}|}{\norm[V]{v}}
+        \le
+        \frac 1 {\alpha}\;\sup_{0\neq v\in V}\frac{\norm[L^2(\Omega)]{f}\norm[L^2(\Omega)]{v}}{\norm[V]{v}}
+        \\
+        \le
+        \frac C {\alpha}\;\sup_{0\neq v\in V}\frac{\norm[L^2(\Omega)]{f}\norm[V]{v}}{\norm[V]{v}}
+        =
+        \frac C {\alpha}\;\norm[L^2(\Omega)]{f}.
+      \end{align*}
   \end{enumerate}
 \end{proof}
 
 \step{\textbf{Proposición}.}
-Si los datos son suficiente regulares ($f\in C^(\Omega)$), entonces la solución débil es una solución clásica del problema~\eqref{eq:problema.dirichlet.homogeneo.1d}.
+Si los datos son suficiente regulares ($f\in C^0(\Omega)$), entonces la solución débil es una solución clásica del problema~\eqref{eq:problema.dirichlet.homogeneo.1d}.
 
 \section{El Método de los Elementos Finitos}
+
+El método de los elementos finitos para el problema de Poisson-Dirichlet 1-dimensional~\eqref{eq:problema.dirichlet.homogeneo.1d} puede expresarse como: dada una partición $a=x_0<x_1<\cdots<x_n=b$ del intervalo $\overline\Omega=[a,b]$, aproximar el espacio $V=H_0^1(\Omega)$ por el subespacio vectorial
+\[
+  V_h = \left\{ v_h\in C^0(\overline\Omega) \ /\ v|_{[x_{i-1},x_i]}\in\P_m \quad \forall i=1,\dots,n, \quad v(a)=v(b)=0 \right\},
+\]
+siendo $\P_m$ el espacio de los polinomios de grado $m\in\N$.
+
+En concreto, sobre este espacio $V_h\subset V$ planteamos el problema:
+\begin{equation}
+  \label{eq:problema.elementos-finitos.1d}
+  \text{Hallar }u_h\in V_h  \enspace\text{tal que} \enspace
+  a(u_h,v_h) = F(v_h) \quad \forall v_h\in V_h.
+\end{equation}
 
 \bibliographystyle{unsrt}
 \bibliography{biblio}
