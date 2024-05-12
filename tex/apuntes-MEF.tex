@@ -395,6 +395,7 @@ Por otra parte, es necesario dotar de sentido preciso al espacio $L^2(\partial\O
 de funciones de $H^1(\Omega)$. 
 
 \step{\textbf{Teorema.}}\footnote{Ver por ejemplo~\cite{sayas2019variational} para una demostración.} 
+\label{paragraph.teorema.traza}
 Existe una función lineal y continua, a la que seguiremos llamando traza y denotando por $\gamma$,
 \[
   \gamma:  H^1(\Omega) \to L^2(\partial\Omega),
@@ -540,7 +541,7 @@ donde  $\alpha>0$ y $C>0$ son, respectivamente, las constantes de coercitividad 
     \item Consideremos el espacio $V=H_0^1(\Omega)$, que es un espacio de Hilbert para el producto escalar $(\cdot,\cdot)_{H^1(\Omega)}$, pues es un subespacio cerrado del espacio de Hilbert $H^1(\Omega)$. 
     \item $a(\cdot,\cdot)$ y $L(\cdot)$ son respectivamente, una forma bilineal continua y una alicación lineal continua sobre $V$. Esto es evidente usando la desigualdad de Cauchy-Schwarz y teniendo en cuenta la norma $\norm[H_0^1(\Omega)]{\cdot}$ (que es equivalente a la $\norm[H^1(\Omega)]{\cdot}$.
     \item La forma bilineal $a(\cdot,\cdot)$ es coercitiva. De hecho, por definición, $a(v,v)=\norm[H_0^1(\Omega)]{v}^2$ para todo $v\in V$. Podemos tomar la constante de coercitividad $\alpha=1$.
-  \item Por tanto podemos aplicar Lema de Lax-Milgram, de donde existe una única solución de~\eqref{eq:problema.variacional.1d}.Aplicaremos~\eqref{eq:Lax-Milgram.estimación} y, consecutivamente: (1) $a(u,v)=(f,v)_{L^2(\Omega)}$ para todo $v\in V$, (2) la desigualdad de Cauchy-Schwarz y (3) la desigualdad de Poincaré-Friedrichs (con constante $C>0$):
+  \item Por tanto podemos aplicar Lema de Lax-Milgram, de donde existe una única solución de~\eqref{eq:problema.variacional.1d}. Aplicaremos~\eqref{eq:Lax-Milgram.estimación} y, consecutivamente: (1) $a(u,v)=(f,v)_{L^2(\Omega)}$ para todo $v\in V$, (2) la desigualdad de Cauchy-Schwarz y (3) la desigualdad de Poincaré-Friedrichs (con constante $C>0$):
       \begin{align*}
         \norm[V]{u} \le 
         \frac 1 {\alpha}\;\sup_{0\neq v\in V}\frac{|a(u,v)|}{\norm[V]{v}} =
@@ -561,18 +562,68 @@ Si los datos son suficiente regulares ($f\in C^0(\Omega)$), entonces la solució
 
 \section{El Método de los Elementos Finitos}
 
-El método de los elementos finitos para el problema de Poisson-Dirichlet 1-dimensional~\eqref{eq:problema.dirichlet.homogeneo.1d} puede expresarse como: dada una partición $a=x_0<x_1<\cdots<x_n=b$ del intervalo $\overline\Omega=[a,b]$, aproximar el espacio $V=H_0^1(\Omega)$ por el subespacio vectorial
+Para definir el método de los elementos finitos para el problema de Poisson-Dirichlet 1-di\-men\-sio\-nal~\eqref{eq:problema.dirichlet.homogeneo.1d}, partimos de un \deff{mallado del dominio} $\Omega=(a,b)$. Esto es, de un conjunto de intervalos $I_i=[x_{i-1},x_i]$, $i=1,\dots,n$ (con $n\in\N$) que forman una partición de $\Omega$, es decir $a=x_0<x_1<\cdots<x_n=b$. 
+A los intervalos $I_i$ los llamamos \deff{elementos} o \deff{celdas}. A los puntos $x_i$ los llamamos \deff{vértices}. Al conjunto de celdas y vértices lo llamamos un \deff{mallado} de $\Omega$ y lo denotamos $\mathcal{T}_h(\Omega)$. 
+
+Los elementos de la malla pueden tener un tamaño variable, $h_i=x_{i-1}-x_i$. Al valor $h=\max_{i=1\dots n}(x_i-x_{i-1})$ lo llamamos \deff{talla de la malla}. Por supuesto, si todos los elementos tienen el mismo tamaño se tendrá $h=x_i-x_{i-1}$ para todo $i$.
+Como veremos, todas estas definiciones se generalizan fácilmente a mallas de dominios de $\R^d$, $d\ge 1$, donde los elemento s estarán formados  por triángulos, rectángulos, tetraedros etc.
+
+\step
+Aproximamos el espacio $V=H_0^1(\Omega)$ por el subespacio vectorial
 \[
   V_h = \left\{ v_h\in C^0(\overline\Omega) \ /\ v|_{[x_{i-1},x_i]}\in\P_m \quad \forall i=1,\dots,n, \quad v(a)=v(b)=0 \right\},
 \]
-siendo $\P_m$ el espacio de los polinomios de grado $m\in\N$.
+siendo $\P_m$ el espacio de los polinomios con coficientes reales de grado no superior a $m\in\N$. 
 
-En concreto, sobre este espacio $V_h\subset V$ planteamos el problema:
+
+Sobre este espacio $V_h\subset V$ planteamos el problema:
 \begin{equation}
   \label{eq:problema.elementos-finitos.1d}
   \text{Hallar }u_h\in V_h  \enspace\text{tal que} \enspace
   a(u_h,v_h) = F(v_h) \quad \forall v_h\in V_h.
 \end{equation}
+Veremos que $V_h$ es un espacio finito-dimensional de $V=H_0^1(\Omega)$ y que el problema anterior equivale a resolver un sistema lineal de ecuaciones. Este razonamiento se puede extender a subespacios finito-dimensionales más generales que el espacio de elementos finitos $V_h$. En el caso general, es conocido como \deff{método de Galerkin}.
+
+\step
+Comenzaremos centrándonos en el caso  $m=1$, donde las funciones de $V_h$ son funciones poligonales y es muy fácil dar una base de $V_h$. 
+En concreto, definamos para $i\in\{1,\dots,n-1\}$ las funciones
+\[
+  \varphi_i(x) = \left\{
+    \begin{aligned}
+      \frac 1{h_{i}} (x-x_{i-1}) &\quad \text{si } x\in I_{i},
+      \\
+      \frac 1{h_{i+1}} (x_{i+1}-x) &\quad \text{si } x\in I_{i+1},
+      \\
+      0 &\quad \text{en otro caso.}
+    \end{aligned}
+    \right.
+\]
+que por supuesto están en $V_h$. Éstas se llaman «funciones sombrero», debido al aspecto de su gráfica.
+
+\step{\textbf{Proposición}.}
+El conjunto $\{\varphi_1,\dots,\varphi_{n-1}\} $ es una base de $V_h$.
+\begin{proof}
+  Para ver que este conjunto es linealmente idependientes, sea $(u_1,\dots,u_{n-1})\in\R^{n-1}$ tale que la función $w=\sum_{i=1}^{n-1} u_i \varphi_i$ es identicamente nula. Como por definición $\varphi_i(x_j)=\delta_{ij}$ (delta de Kronecker) entonces, para todo $i$, $w(x_i)=u_i=0$. 
+
+  Para ver que es un sistema generador, basta observar de que toda función $v_h\in V_h$ puede escribirse como $v_h=\sum_{i=1}^{m-1} v_h(x_i)\varphi_i$, pues ambas funciones son afines en cada $I_i$ y toman los mismos valores en los extremos del intervalo.
+\end{proof}
+
+\step{\textbf{Proposición}.}
+$V_h\subset H_0^1(\Omega)$
+\begin{proof}
+  Para toda función $v_h$ se puede definir $v_h'$ como la función constenate a trozos cuyo valor en cada intervalo $I_i$ es igual a la pendiente de la función afín $v_h |_{I_i}$. Evidentemente, esta función es de $L_2(\Omega)$
+  Por otra parte, $v_h$ es una función continua y $v_h|_{\partial\Omega}$=0, por lo tanto\footnote{Ver Teorema~\ref{paragraph.teorema.traza}} es de $H_0^1(\Omega)$. 
+\end{proof}
+
+\step{\textbf{Proposición}.}
+El problema de elementos finitos~\eqref{eq:problema.elementos-finitos.1d} es equivalente a un sistema de ecuaciones lineales $AU=B$ donde
+\[
+  A_{ij}=a(\varphi_j,\varphi_i), \quad B_i=F(\phi_i).
+\]
+
+\subsection*{Estimaciones de error y orden de convergencia}
+
+
 
 \bibliographystyle{unsrt}
 \bibliography{biblio}
