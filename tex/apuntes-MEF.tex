@@ -615,15 +615,37 @@ $V_h\subset H_0^1(\Omega)$
   Por otra parte, $v_h$ es una función continua y $v_h|_{\partial\Omega}$=0, por lo tanto\footnote{Ver Teorema~\ref{paragraph.teorema.traza}} es de $H_0^1(\Omega)$. 
 \end{proof}
 
+\step{\textbf{Proposición}.
+El problema de elementos finitos~\eqref{eq:problema.elementos-finitos.1d} tiene una única solución.
+\begin{proof}
+  $V_h$ es un espacio finito-dimensional de $V=H_0^1(\Omega)$, por tanto un subespacio cerrado. Por tanto, $V_h$ es también un espacio de Hilbert para el producto escalar de $H_0^1(\Omega)$ y su norma asociada.
+
+Puesto que, para esta norma, $a(\cdot,\cdot)$ es bilineal, continua y coercitiva y $L(\cdot)$ es lineal y continua, podemos aplidar el teorema de Lax-Milgram.
+\end{proof}
+
+
 \step{\textbf{Proposición}.}
 El problema de elementos finitos~\eqref{eq:problema.elementos-finitos.1d} es equivalente a un sistema de ecuaciones lineales $AU=B$ donde
 \[
   A_{ij}=a(\varphi_j,\varphi_i), \quad B_i=F(\phi_i).
 \]
 
+\begin{proof}
+ Una solución de~\eqref{eq:problema.elementos-finitos.1d} 
+\end{proof}
+
+  
 \subsection*{Estimaciones de error y orden de convergencia}
 
+La clave en las estimaciones de error está en comprobar que el error es ortogonal al espacio $V_h$, en el siguiente sentido: 
+\step{\textbf{Proposición}.}
+Sea $u\in V=H_0^1(\Omega)$ la solución del la formulación variacional~\eqref{eq:problema.variacional.1d} del problema de Poission con condiciones de contorno Dirichlet homogéneas.
+Sea $u_h\in V_h$ la solución del problema de elementos finitos~\eqref{eq:problema.elementos-finitos.1d}. Entonces el error es $a$--ortogonal a $V_h$, es decir:
+\[
+  a(u-u_h, v_h) = 0 \quad \forall v_h\in V_h.
+\]
 
+\step {\textbf{Observación}:} aunque el resultado anterior se ha enunciado en el caso en que $u_h$ es una aproximación de $u$ por elementos finitos, puede generalizarse al caso más general de métodos de Galerkin, en el que $V_h$ es cualquier subespacio finito-dimensional de un espacio de Hilbert $V$.
 
 \bibliographystyle{unsrt}
 \bibliography{biblio}
